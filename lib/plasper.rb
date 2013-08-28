@@ -16,7 +16,7 @@ class Plasper
     word_length  = weighted_select(@word_range).to_i
     word, length = '', 0
     while length < word_length
-      letter = rand(100) > 40 ? consonant : vowel
+      letter = rand(100) < 40 ? consonant : vowel
       word   += letter
       length += 1
     end
