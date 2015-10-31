@@ -31,9 +31,21 @@ describe Plasper::Plasper do
       expect(plasper.first_letters['ш']).to eq(2)
     end
 
-    it 'adds next letter weight'
-    it 'increases next letter weight'
-    it 'includes nil in next letter weight'
+    it 'adds next letter weight' do
+      plasper.add_word 'adds'
+      expect(plasper.next_letters['d']).to eq('d' => 1, 's' => 1)
+    end
+
+    it 'increases next letter weight' do
+      plasper.add_word 'adds'
+      plasper.add_word 'pods'
+      expect(plasper.next_letters['d']).to eq('d' => 1, 's' => 2)
+    end
+
+    it 'includes nil in next letter weight for last letter' do
+      plasper.add_word 'nils'
+      expect(plasper.next_letters['s']).to have_key(nil)
+    end
   end
 
   describe '#add_sentence' do
