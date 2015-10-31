@@ -20,13 +20,23 @@ describe Plasper::Plasper do
       expect(plasper.letter_weight).to eq('а' => 2, 'г' => 1)
     end
 
-    it 'adds first_letter weight'
-    it 'increases first_letter weight'
+    it 'adds first_letter weight' do
+      plasper.add_word 'шило'
+      expect(plasper.first_letters['ш']).to eq(1)
+    end
+
+    it 'increases first_letter weight' do
+      plasper.add_word 'шашки'
+      plasper.add_word 'шлем'
+      expect(plasper.first_letters['ш']).to eq(2)
+    end
+
     it 'adds next letter weight'
     it 'increases next letter weight'
+    it 'includes nil in next letter weight'
   end
 
   describe '#add_sentence' do
-
+    pending
   end
 end
