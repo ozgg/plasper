@@ -20,7 +20,6 @@ module Plasper
 
     def add_sentence(sentence)
       words = sentence.split(/\s+/)
-      p words
       @word_count[words.length] += 1
     end
 

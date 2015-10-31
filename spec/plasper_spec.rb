@@ -1,6 +1,6 @@
 require 'plasper'
 
-describe Plasper::Plasper do
+RSpec.describe Plasper::Plasper do
   let(:plasper) { Plasper::Plasper.new }
 
   describe '#add_word' do

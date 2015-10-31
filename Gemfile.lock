@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     plasper (0.1.0)
+      weighted-select (~> 1.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -20,13 +21,14 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
+    weighted-select (1.0.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   plasper!
-  rspec
+  rspec (~> 3.3)
 
 BUNDLED WITH
    1.10.6
