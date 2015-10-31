@@ -49,6 +49,23 @@ describe Plasper::Plasper do
   end
 
   describe '#add_sentence' do
-    pending
+    it 'splits sentence into words by whitespace' do
+      expect_any_instance_of(String).to receive(:split).with(/\s+/).and_return([])
+      plasper.add_sentence 'Красные пятки торчат из грядки!'
+    end
+
+    it 'adds number of words in sentence' do
+      plasper.add_sentence 'Красные пятки торчат из грядки?'
+      expect(plasper.word_count[5]).to eq(1)
+    end
+
+    it 'increases number of words in sentence' do
+      plasper.add_sentence 'In three words...'
+      plasper.add_sentence 'This is right!'
+      expect(plasper.word_count[3]).to eq(2)
+    end
+
+    it 'strips punctuation characters'
+    it 'passes each word to #add_word'
   end
 end

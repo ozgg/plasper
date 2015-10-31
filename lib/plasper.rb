@@ -1,12 +1,13 @@
 module Plasper
   class Plasper
-    attr_reader :length_weight, :letter_weight, :first_letters, :next_letters
+    attr_reader :length_weight, :letter_weight, :first_letters, :next_letters, :word_count
 
     def initialize
       @length_weight = Hash.new(0)
       @letter_weight = Hash.new(0)
       @first_letters = Hash.new(0)
       @next_letters  = Hash.new
+      @word_count    = Hash.new(0)
     end
 
     # @param [String] word
@@ -15,6 +16,12 @@ module Plasper
       word.each_char { |letter| @letter_weight[letter] += 1 }
       @first_letters[word[0]] += 1
       count_next_letters word
+    end
+
+    def add_sentence(sentence)
+      words = sentence.split(/\s+/)
+      p words
+      @word_count[words.length] += 1
     end
 
     private
