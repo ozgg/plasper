@@ -3,6 +3,23 @@ require 'plasper'
 RSpec.describe Plasper::Plasper do
   let(:plasper) { Plasper::Plasper.new }
 
+  describe '#add_letter_weight' do
+    it 'counts letter_weight for letter' do
+      plasper.add_letter_weight 'w', 2
+      expect(plasper.letter_weight['w']).to eq(2)
+    end
+
+    it 'uses 1 as default weight' do
+      plasper.add_letter_weight 'w', 3
+      expect { plasper.add_letter_weight 'w' }.to change { plasper.letter_weight['w'] }.by(1)
+    end
+
+    it 'increases letter_weight for letter' do
+      plasper.add_letter_weight 'w'
+      expect { plasper.add_letter_weight 'w', 3}.to change { plasper.letter_weight['w'] }.by(3)
+    end
+  end
+
   describe '#add_word' do
     it 'adds length weight' do
       plasper.add_word 'sample'
@@ -15,9 +32,9 @@ RSpec.describe Plasper::Plasper do
       expect(plasper.length_weight[5]).to eq(2)
     end
 
-    it 'counts letter weight for each letter in word' do
-      plasper.add_word 'ага'
-      expect(plasper.letter_weight).to eq('а' => 2, 'г' => 1)
+    it 'increases letter weight for each letter' do
+      expect(plasper).to receive(:add_letter_weight).exactly(3).times
+      plasper.add_word 'hey'
     end
 
     it 'adds first_letter weight' do
