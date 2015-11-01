@@ -1,6 +1,6 @@
 module Plasper
   class Plasper
-    attr_reader :length_weight, :letter_weight, :first_letters, :next_letters, :word_count
+    attr_reader :length_weight, :letter_weight, :first_weight, :next_weight, :word_count
 
     def initialize
       @first_letters = Hash.new(0)
@@ -24,7 +24,7 @@ module Plasper
       add_length_weight word.length
       word.each_char { |letter| add_letter_weight letter }
 
-      @first_letters[word[0]] += 1
+      @first_weight[word[0]] += 1
       count_next_letters word
     end
 
@@ -41,8 +41,8 @@ module Plasper
     def count_next_letters(word)
       word.length.times do |l|
         letter                              = word[l]
-        @next_letters[letter]               = Hash.new(0) unless @next_letters.has_key? letter
-        @next_letters[letter][word[l.succ]] += 1
+        @next_weight[letter]               = Hash.new(0) unless @next_weight.has_key? letter
+        @next_weight[letter][word[l.succ]] += 1
       end
     end
   end

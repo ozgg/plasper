@@ -16,20 +16,31 @@ RSpec.describe Plasper::Plasper do
 
     it 'increases letter_weight for letter' do
       plasper.add_letter_weight 'w'
-      expect { plasper.add_letter_weight 'w', 3}.to change { plasper.letter_weight['w'] }.by(3)
+      expect { plasper.add_letter_weight 'w', 3 }.to change { plasper.letter_weight['w'] }.by(3)
+    end
+  end
+
+  describe '#add_length_weight' do
+    it 'counts length_weight for length' do
+      plasper.add_length_weight 6, 2
+      expect(plasper.length_weight[6]).to eq(2)
+    end
+
+    it 'uses 1 as default weight' do
+      plasper.add_length_weight 6, 3
+      expect { plasper.add_length_weight 6 }.to change { plasper.length_weight[6] }.by(1)
+    end
+
+    it 'increases length_weight for length' do
+      plasper.add_length_weight 6
+      expect { plasper.add_length_weight 6, 3 }.to change { plasper.length_weight[6] }.by(3)
     end
   end
 
   describe '#add_word' do
-    it 'adds length weight' do
-      plasper.add_word 'sample'
-      expect(plasper.length_weight[6]).to eq(1)
-    end
-
-    it 'increases length weight for existing words' do
-      plasper.add_word 'first'
-      plasper.add_word 'other'
-      expect(plasper.length_weight[5]).to eq(2)
+    it 'increases length weight for word length' do
+      expect(plasper).to receive(:add_length_weight).with(5).once
+      plasper.add_word 'hello'
     end
 
     it 'increases letter weight for each letter' do
@@ -39,29 +50,29 @@ RSpec.describe Plasper::Plasper do
 
     it 'adds first_letter weight' do
       plasper.add_word 'шило'
-      expect(plasper.first_letters['ш']).to eq(1)
+      expect(plasper.first_weight['ш']).to eq(1)
     end
 
     it 'increases first_letter weight' do
       plasper.add_word 'шашки'
       plasper.add_word 'шлем'
-      expect(plasper.first_letters['ш']).to eq(2)
+      expect(plasper.first_weight['ш']).to eq(2)
     end
 
     it 'adds next letter weight' do
       plasper.add_word 'adds'
-      expect(plasper.next_letters['d']).to eq('d' => 1, 's' => 1)
+      expect(plasper.next_weight['d']).to eq('d' => 1, 's' => 1)
     end
 
     it 'increases next letter weight' do
       plasper.add_word 'adds'
       plasper.add_word 'pods'
-      expect(plasper.next_letters['d']).to eq('d' => 1, 's' => 2)
+      expect(plasper.next_weight['d']).to eq('d' => 1, 's' => 2)
     end
 
     it 'includes nil in next letter weight for last letter' do
       plasper.add_word 'nils'
-      expect(plasper.next_letters['s']).to have_key(nil)
+      expect(plasper.next_weight['s']).to have_key(nil)
     end
   end
 
