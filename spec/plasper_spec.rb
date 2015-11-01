@@ -77,6 +77,23 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
+  describe '#add_words_weight' do
+    it 'uses 1 as default weight' do
+      plasper.add_words_weight 6
+      expect(plasper.words_weight[6]).to eq(1)
+    end
+
+    it 'counts words_weight for length' do
+      plasper.add_words_weight 6, 3
+      expect(plasper.words_weight[6]).to eq(3)
+    end
+
+    it 'increases words_weight for length' do
+      plasper.add_words_weight 6
+      expect { plasper.add_words_weight 6, 3 }.to change { plasper.words_weight[6] }.by(3)
+    end
+  end
+
   describe '#add_word' do
     it 'increases length weight for word length' do
       expect(plasper).to receive(:add_length_weight).with(5).once
@@ -106,22 +123,33 @@ RSpec.describe Plasper::Plasper do
 
   describe '#add_sentence' do
     it 'splits sentence into words by whitespace' do
-      expect_any_instance_of(String).to receive(:split).with(/\s+/).and_return([])
+      expect_any_instance_of(String).to receive(:split).with(/\s+/).and_call_original
       plasper.add_sentence 'Красные пятки торчат из грядки!'
     end
 
-    it 'adds number of words in sentence' do
+    it 'adds words_weight for number of words in sentence' do
+      expect(plasper).to receive(:add_words_weight).once.with(5)
       plasper.add_sentence 'Красные пятки торчат из грядки?'
-      expect(plasper.word_count[5]).to eq(1)
     end
 
-    it 'increases number of words in sentence' do
-      plasper.add_sentence 'In three words...'
-      plasper.add_sentence 'This is right!'
-      expect(plasper.word_count[3]).to eq(2)
+    it 'strips punctuation characters' do
+      expect_any_instance_of(String).to receive(:gsub).and_call_original
+      plasper.add_sentence '"«Ага!»"?юю...'
     end
 
-    it 'strips punctuation characters'
-    it 'passes each word to #add_word'
+    it 'keeps dashes' do
+      plasper.add_sentence 'Чудо-юдо рыба-кит.'
+      expect(plasper.letter_weight).to have_key('-')
+    end
+
+    it 'casts each word to lowercase' do
+      expect(Unicode).to receive(:downcase).and_call_original
+      plasper.add_sentence 'Бывает!'
+    end
+
+    it 'passes each reasonable word to #add_word' do
+      expect(plasper).to receive(:add_word).twice
+      plasper.add_sentence 'Какая чудесная ***!'
+    end
   end
 end

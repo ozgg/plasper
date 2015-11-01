@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     plasper (0.1.0)
+      unicode (~> 0.4.4)
       weighted-select (~> 1.0.0)
 
 GEM
@@ -21,6 +22,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
+    unicode (0.4.4.2)
     weighted-select (1.0.0)
 
 PLATFORMS

@@ -1,6 +1,8 @@
+require 'unicode'
+
 module Plasper
   class Plasper
-    attr_reader :length_weight, :letter_weight, :first_weight, :next_weight, :word_count
+    attr_reader :length_weight, :letter_weight, :first_weight, :next_weight, :words_weight
 
     def add_letter_weight(letter, weight = 1)
       @letter_weight ||= Hash.new(0)
@@ -21,10 +23,16 @@ module Plasper
     end
 
     def add_next_weight(letter, next_letter, weight = 1)
-      @next_weight ||= Hash.new
+      @next_weight         ||= Hash.new
       @next_weight[letter] = Hash.new(0) unless @next_weight.has_key? letter
 
       @next_weight[letter][next_letter] += Integer weight
+    end
+
+    def add_words_weight(word_count, weight = 1)
+      @words_weight ||= Hash.new(0)
+
+      @words_weight[word_count] += Integer weight
     end
 
     # @param [String] word
@@ -36,10 +44,16 @@ module Plasper
     end
 
     def add_sentence(sentence)
-      @word_count ||= Hash.new(0)
-      words       = sentence.split(/\s+/)
+      words = sentence.split(/\s+/)
+      add_words_weight words.length
+      words.each { |word| process_word word }
+    end
 
-      @word_count[words.length] += 1
+    private
+
+    def process_word(word)
+      stripped_word = word.gsub(/[^[:word:]-]/u, '')
+      add_word Unicode.downcase(stripped_word) unless stripped_word == ''
     end
   end
 end
