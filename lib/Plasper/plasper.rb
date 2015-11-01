@@ -2,9 +2,11 @@ module Plasper
   class Plasper
     attr_reader :length_weight, :first_weight, :next_weight, :last_weight
     attr_reader :words_weight, :sentences_weight
+    attr_reader :weights
 
     def initialize
       @selectors = { next: Hash.new, last: Hash.new }
+      @weights   = Hash.new
     end
 
     def word
@@ -116,6 +118,12 @@ module Plasper
       sentences = passage.split(/[?!.]/).select { |sentence| sentence.chomp != '' }
       sentences.each { |sentence| add_sentence sentence }
       add_sentences_weight sentences.count
+    end
+
+    def add_weight(category, item, weight = 1)
+      @weights[category] ||= Hash.new(0)
+
+      @weights[category][item] += Integer weight
     end
 
     private

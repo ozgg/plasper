@@ -4,6 +4,23 @@ require 'weighted-select'
 RSpec.describe Plasper::Plasper do
   let(:plasper) { Plasper::Plasper.new }
 
+  describe '#add_weight' do
+    it 'uses 1 as default weight' do
+      plasper.add_weight :letters, 6
+      expect(plasper.weights[:letters][6]).to eq(1)
+    end
+
+    it 'uses explicitly set weight' do
+      plasper.add_weight :letters, 5, 2
+      expect(plasper.weights[:letters][5]).to eq(2)
+    end
+
+    it 'increments weight for key' do
+      plasper.add_weight :letters, 7, 4
+      expect { plasper.add_weight(:letters, 7, 3) }.to change { plasper.weights[:letters][7] }.by(3)
+    end
+  end
+
   describe '#add_length_weight' do
     it 'uses 1 as default weight' do
       plasper.add_length_weight 6
@@ -286,7 +303,7 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#sentence_length'  do
+  describe '#sentence_length' do
     it 'returns 0 when words_weight is empty' do
       expect(plasper.send(:sentence_length)).to eq(0)
     end
