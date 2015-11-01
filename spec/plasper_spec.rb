@@ -295,18 +295,20 @@ RSpec.describe Plasper::Plasper do
     context 'when length is one letter' do
       before(:each) { allow(plasper).to receive(:word_length).and_return(1) }
 
-      it 'calls #last_letter with nil once' do
-        expect(plasper).to receive(:last_letter).with(nil).once
+      it 'calls #last_letter! with nil once' do
+        expect(plasper).to receive(:last_letter!).with(nil).once
         plasper.word
       end
 
       it 'does not call #first_letter' do
+        allow(plasper).to receive(:last_letter!).and_return('a')
         expect(plasper).not_to receive(:first_letter)
         plasper.word
       end
 
-      it 'does not call #next_letter' do
-        expect(plasper).not_to receive(:next_letter)
+      it 'does not call #next_letter!' do
+        allow(plasper).to receive(:last_letter!).and_return('a')
+        expect(plasper).not_to receive(:next_letter!)
         plasper.word
       end
     end
@@ -316,20 +318,20 @@ RSpec.describe Plasper::Plasper do
 
       it 'calls #first_letter once' do
         expect(plasper).to receive(:first_letter).once.and_return 'a'
-        allow(plasper).to receive(:last_letter).and_return('')
+        allow(plasper).to receive(:last_letter!).and_return('')
         plasper.word
       end
 
-      it 'calls #last_letter with the first letter as argument once' do
+      it 'calls #last_letter! with the first letter as argument once' do
         allow(plasper).to receive(:first_letter).and_return('a')
-        expect(plasper).to receive(:last_letter).with('a').once.and_return('b')
+        expect(plasper).to receive(:last_letter!).with('a').once.and_return('b')
         plasper.word
       end
 
-      it 'does not call #next_letter' do
+      it 'does not call #next_letter!' do
         allow(plasper).to receive(:first_letter).and_return('')
-        allow(plasper).to receive(:last_letter).and_return('')
-        expect(plasper).not_to receive(:next_letter)
+        allow(plasper).to receive(:last_letter!).and_return('')
+        expect(plasper).not_to receive(:next_letter!)
         plasper.word
       end
     end
@@ -338,23 +340,23 @@ RSpec.describe Plasper::Plasper do
       before(:each) { allow(plasper).to receive(:word_length).and_return(4) }
 
       it 'calls #first_letter once' do
-        allow(plasper).to receive(:next_letter).and_return('b')
-        allow(plasper).to receive(:last_letter).and_return('c')
+        allow(plasper).to receive(:next_letter!).and_return('b')
+        allow(plasper).to receive(:last_letter!).and_return('c')
         expect(plasper).to receive(:first_letter).once.and_return('a')
         plasper.word
       end
 
-      it 'calls #next_letter (word.length - 2) times' do
+      it 'calls #next_letter! (word.length - 2) times' do
         allow(plasper).to receive(:first_letter).and_return('a')
-        allow(plasper).to receive(:last_letter).and_return('c')
-        expect(plasper).to receive(:next_letter).twice.and_return('b')
+        allow(plasper).to receive(:last_letter!).and_return('c')
+        expect(plasper).to receive(:next_letter!).twice.and_return('b')
         plasper.word
       end
 
-      it 'calls #last_letter once' do
+      it 'calls #last_letter! once' do
         allow(plasper).to receive(:first_letter).and_return('a')
-        allow(plasper).to receive(:next_letter).and_return('b')
-        expect(plasper).to receive(:last_letter).once.and_return('c')
+        allow(plasper).to receive(:next_letter!).and_return('b')
+        expect(plasper).to receive(:last_letter!).once.and_return('c')
         plasper.word
       end
     end

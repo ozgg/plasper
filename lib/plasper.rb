@@ -12,11 +12,11 @@ module Plasper
     def word
       letter_count = word_length
       if letter_count == 1
-        last_letter nil
+        last_letter! nil
       elsif letter_count > 0
         result = first_letter
-        (letter_count - 2).times { result += next_letter(result[-1]) }
-        result + last_letter(result[-1])
+        (letter_count - 2).times { result += next_letter!(result[-1]) }
+        result + last_letter!(result[-1])
       end
     end
 
