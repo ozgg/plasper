@@ -1,4 +1,5 @@
 require 'plasper'
+require 'weighted-select'
 
 RSpec.describe Plasper::Plasper do
   let(:plasper) { Plasper::Plasper.new }
@@ -187,6 +188,18 @@ RSpec.describe Plasper::Plasper do
       passage = 'Деда... Это... Опа.'
       expect(plasper).to receive(:add_sentences_weight).with(3)
       plasper.add_passage passage
+    end
+  end
+
+  describe '#first_letter' do
+    it 'returns nil when no first letter weights present' do
+      expect(plasper.first_letter).to be_nil
+    end
+
+    it 'returns weighted-random letter from first-letter weights' do
+      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
+      plasper.add_first_weight 'a'
+      plasper.first_letter
     end
   end
 end

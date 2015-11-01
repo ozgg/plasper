@@ -5,6 +5,13 @@ module Plasper
     attr_reader :length_weight, :letter_weight, :first_weight, :next_weight
     attr_reader :words_weight, :sentences_weight
 
+    def first_letter
+      if defined? @first_weight
+        @letter_selector ||= WeightedSelect::Selector.new @first_weight
+        @letter_selector.select
+      end
+    end
+
     def add_letter_weight(letter, weight = 1)
       @letter_weight ||= Hash.new(0)
 
