@@ -37,6 +37,23 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
+  describe '#add_first_weight' do
+    it 'counts first_weight for letter' do
+      plasper.add_first_weight 'w', 2
+      expect(plasper.first_weight['w']).to eq(2)
+    end
+
+    it 'uses 1 as default weight' do
+      plasper.add_first_weight 'w', 3
+      expect { plasper.add_first_weight 'w' }.to change { plasper.first_weight['w'] }.by(1)
+    end
+
+    it 'increases first_weight for letter' do
+      plasper.add_first_weight 'w'
+      expect { plasper.add_first_weight 'w', 3 }.to change { plasper.first_weight['w'] }.by(3)
+    end
+  end
+
   describe '#add_word' do
     it 'increases length weight for word length' do
       expect(plasper).to receive(:add_length_weight).with(5).once
@@ -48,15 +65,9 @@ RSpec.describe Plasper::Plasper do
       plasper.add_word 'hey'
     end
 
-    it 'adds first_letter weight' do
-      plasper.add_word 'шило'
-      expect(plasper.first_weight['ш']).to eq(1)
-    end
-
-    it 'increases first_letter weight' do
-      plasper.add_word 'шашки'
-      plasper.add_word 'шлем'
-      expect(plasper.first_weight['ш']).to eq(2)
+    it 'increases first letter weight for letter' do
+      expect(plasper).to receive(:add_first_weight).with('y').once
+      plasper.add_word 'yay'
     end
 
     it 'adds next letter weight' do

@@ -4,27 +4,32 @@ module Plasper
 
     def initialize
       @first_letters = Hash.new(0)
-      @next_letters  = Hash.new
+      @next_weight  = Hash.new
     end
 
     def add_letter_weight(letter, weight = 1)
       @letter_weight ||= Hash.new(0)
 
-      @letter_weight[letter] += Integer(weight)
+      @letter_weight[letter] += Integer weight
     end
 
     def add_length_weight(length, weight = 1)
       @length_weight ||= Hash.new(0)
 
-      @length_weight[length] += Integer(weight)
+      @length_weight[length] += Integer weight
+    end
+
+    def add_first_weight(letter, weight = 1)
+      @first_weight ||= Hash.new(0)
+
+      @first_weight[letter] += Integer weight
     end
 
     # @param [String] word
     def add_word(word)
       add_length_weight word.length
       word.each_char { |letter| add_letter_weight letter }
-
-      @first_weight[word[0]] += 1
+      add_first_weight word[0]
       count_next_letters word
     end
 
