@@ -53,14 +53,16 @@ module Plasper
     def add_sentence(sentence)
       words = sentence.split(/\s+/)
       add_words_weight words.length
-      words.each { |word| process_word word }
+      words.each do |word|
+        stripped_word = word.gsub(/[^[:word:]-]/u, '')
+        add_word Unicode.downcase(stripped_word) unless stripped_word == ''
+      end
     end
 
-    private
-
-    def process_word(word)
-      stripped_word = word.gsub(/[^[:word:]-]/u, '')
-      add_word Unicode.downcase(stripped_word) unless stripped_word == ''
+    def add_passage(passage)
+      sentences = passage.split(/[?!.]/).select { |sentence| sentence.chomp != '' }
+      sentences.each { |sentence| add_sentence sentence }
+      add_sentences_weight sentences.count
     end
   end
 end

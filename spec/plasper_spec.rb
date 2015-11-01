@@ -94,7 +94,7 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#add_sentences_weight', focus: true do
+  describe '#add_sentences_weight' do
     it 'uses 1 as default weight' do
       plasper.add_sentences_weight 6
       expect(plasper.sentences_weight[6]).to eq(1)
@@ -170,9 +170,23 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#add_passage', focus: true do
-    it 'splits passage to sentences'
-    it 'adds each non-empty sentence'
-    it 'counts sentences weight'
+  describe '#add_passage' do
+    it 'splits passage to sentences' do
+      passage = 'Ночь, улица. Фонарь? Ещё и аптека!'
+      expect(passage).to receive(:split).and_call_original
+      plasper.add_passage passage
+    end
+
+    it 'adds each non-empty sentence' do
+      passage = 'Давно. А?! Это было давно?...'
+      expect(plasper).to receive(:add_sentence).exactly(3).times
+      plasper.add_passage passage
+    end
+
+    it 'counts sentences weight with non-empty sentence count' do
+      passage = 'Деда... Это... Опа.'
+      expect(plasper).to receive(:add_sentences_weight).with(3)
+      plasper.add_passage passage
+    end
   end
 end
