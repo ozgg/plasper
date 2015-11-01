@@ -20,6 +20,16 @@ module Plasper
       end
     end
 
+    def sentence
+      string = sentence_length.times.map { word }.join(' ')
+      string[0] = Unicode.upcase(string[0]) unless string.to_s == ''
+      string
+    end
+
+    def passage
+      passage_length.times.map { sentence }.join('. ')
+    end
+
     def first_letter
       if defined? @first_weight
         @selectors[:first] ||= WeightedSelect::Selector.new @first_weight

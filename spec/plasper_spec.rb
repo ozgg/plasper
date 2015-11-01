@@ -385,4 +385,49 @@ RSpec.describe Plasper::Plasper do
       end
     end
   end
+
+  describe '#sentence' do
+    it 'determines word count once' do
+      expect(plasper).to receive(:sentence_length).and_return(0)
+      plasper.sentence
+    end
+
+    it 'calls #word necessary number of times' do
+      allow(plasper).to receive(:sentence_length).and_return(3)
+      expect(plasper).to receive(:word).exactly(3).times
+      plasper.sentence
+    end
+
+    it 'joins result of #word invocations with space' do
+      allow(plasper).to receive(:sentence_length).and_return(3)
+      allow(plasper).to receive(:word).and_return('good')
+      expect(plasper.sentence.scan(' ').length).to eq(2)
+    end
+
+    it 'capitalizes the first letter of sentence' do
+      allow(plasper).to receive(:sentence_length).and_return(3)
+      allow(plasper).to receive(:word).and_return('good')
+      expect(Unicode).to receive(:upcase).with('g').once.and_call_original
+      plasper.sentence
+    end
+  end
+
+  describe '#passage' do
+    it 'determines sentence count once' do
+      expect(plasper).to receive(:passage_length).and_return(0)
+      plasper.passage
+    end
+
+    it 'calls #sentence necessary number of times' do
+      allow(plasper).to receive(:passage_length).and_return(5)
+      expect(plasper).to receive(:sentence).exactly(5).times
+      plasper.passage
+    end
+
+    it 'joins result of #sentence invocations with dot' do
+      allow(plasper).to receive(:passage_length).and_return(3)
+      allow(plasper).to receive(:sentence).and_return('It works')
+      expect(plasper.passage.scan('. ').length).to eq(2)
+    end
+  end
 end
