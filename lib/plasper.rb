@@ -2,7 +2,8 @@ require 'unicode'
 
 module Plasper
   class Plasper
-    attr_reader :length_weight, :letter_weight, :first_weight, :next_weight, :words_weight
+    attr_reader :length_weight, :letter_weight, :first_weight, :next_weight
+    attr_reader :words_weight, :sentences_weight
 
     def add_letter_weight(letter, weight = 1)
       @letter_weight ||= Hash.new(0)
@@ -33,6 +34,12 @@ module Plasper
       @words_weight ||= Hash.new(0)
 
       @words_weight[word_count] += Integer weight
+    end
+
+    def add_sentences_weight(sentence_count, weight = 1)
+      @sentences_weight ||= Hash.new(0)
+
+      @sentences_weight[sentence_count] += Integer weight
     end
 
     # @param [String] word

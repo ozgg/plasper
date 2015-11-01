@@ -94,6 +94,23 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
+  describe '#add_sentences_weight', focus: true do
+    it 'uses 1 as default weight' do
+      plasper.add_sentences_weight 6
+      expect(plasper.sentences_weight[6]).to eq(1)
+    end
+
+    it 'counts sentences_weight for length' do
+      plasper.add_sentences_weight 6, 3
+      expect(plasper.sentences_weight[6]).to eq(3)
+    end
+
+    it 'increases sentences_weight for length' do
+      plasper.add_sentences_weight 6
+      expect { plasper.add_sentences_weight 6, 3 }.to change { plasper.sentences_weight[6] }.by(3)
+    end
+  end
+
   describe '#add_word' do
     it 'increases length weight for word length' do
       expect(plasper).to receive(:add_length_weight).with(5).once
@@ -151,5 +168,11 @@ RSpec.describe Plasper::Plasper do
       expect(plasper).to receive(:add_word).twice
       plasper.add_sentence 'Какая чудесная ***!'
     end
+  end
+
+  describe '#add_passage', focus: true do
+    it 'splits passage to sentences'
+    it 'adds each non-empty sentence'
+    it 'counts sentences weight'
   end
 end
