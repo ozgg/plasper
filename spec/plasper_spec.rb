@@ -286,6 +286,30 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
+  describe '#sentence_length'  do
+    it 'returns 0 when words_weight is empty' do
+      expect(plasper.send(:sentence_length)).to eq(0)
+    end
+
+    it 'returns weighted-random number from words_weight' do
+      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
+      plasper.add_words_weight 4
+      plasper.send(:sentence_length)
+    end
+  end
+
+  describe '#passage_length' do
+    it 'returns 0 when sentences_weight is empty' do
+      expect(plasper.send(:passage_length)).to eq(0)
+    end
+
+    it 'returns weighted-random number from sentences_weight' do
+      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
+      plasper.add_sentences_weight 4
+      plasper.send(:passage_length)
+    end
+  end
+
   describe '#word' do
     it 'selects random word length by weight once' do
       expect(plasper).to receive(:word_length).once.and_return(0)

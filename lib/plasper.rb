@@ -120,5 +120,23 @@ module Plasper
         0
       end
     end
+
+    def sentence_length
+      if defined? @words_weight
+        @selectors[:words] ||= WeightedSelect::Selector.new @words_weight
+        @selectors[:words].select
+      else
+        0
+      end
+    end
+
+    def passage_length
+      if defined? @sentences_weight
+        @selectors[:sentences] ||= WeightedSelect::Selector.new @sentences_weight
+        @selectors[:sentences].select
+      else
+        0
+      end
+    end
   end
 end
