@@ -231,6 +231,19 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
+  describe '#next_letter!' do
+    it 'calls #next_letter' do
+      expect(plasper).to receive(:next_letter).with('a').once
+      plasper.next_letter! 'a'
+    end
+
+    it 'falls back to #first_letter' do
+      allow(plasper).to receive(:next_letter).and_return(nil)
+      expect(plasper).to receive(:first_letter)
+      plasper.next_letter! 'b'
+    end
+  end
+
   describe '#last_letter' do
     it 'returns nil when last_weight is empty' do
       expect(plasper.last_letter 'a').to be_nil
@@ -245,6 +258,19 @@ RSpec.describe Plasper::Plasper do
       expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
       plasper.add_last_weight 'a', 'b'
       plasper.last_letter 'a'
+    end
+  end
+
+  describe '#last_letter!' do
+    it 'calls #last_letter' do
+      expect(plasper).to receive(:last_letter).with('a').once
+      plasper.last_letter! 'a'
+    end
+
+    it 'falls back to #next_letter!' do
+      allow(plasper).to receive(:last_letter).and_return(nil)
+      expect(plasper).to receive(:next_letter!).with('b')
+      plasper.last_letter! 'b'
     end
   end
 

@@ -11,15 +11,12 @@ module Plasper
 
     def word
       letter_count = word_length
-      if letter_count > 0
-        if letter_count == 1
-          last_letter nil
-        else
-          result = ''
-          result += first_letter
-          (letter_count - 2).times { result += next_letter(result[-1]) }
-          result + last_letter(result[-1])
-        end
+      if letter_count == 1
+        last_letter nil
+      elsif letter_count > 0
+        result = first_letter
+        (letter_count - 2).times { result += next_letter(result[-1]) }
+        result + last_letter(result[-1])
       end
     end
 
@@ -37,11 +34,19 @@ module Plasper
       end
     end
 
+    def next_letter!(current_letter)
+      next_letter(current_letter) || first_letter.to_s
+    end
+
     def last_letter(penultimate_letter)
       if defined?(@last_weight) && @last_weight.has_key?(penultimate_letter)
         @selectors[:last][penultimate_letter] ||= WeightedSelect::Selector.new @last_weight[penultimate_letter]
         @selectors[:last][penultimate_letter].select
       end
+    end
+
+    def last_letter!(penultimate_letter)
+      last_letter(penultimate_letter) || next_letter!(penultimate_letter)
     end
 
     def add_length_weight(length, weight = 1)
