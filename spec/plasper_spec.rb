@@ -118,7 +118,7 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#add_word', focus: true do
+  describe '#add_word' do
     it 'increases length weight for word length' do
       expect(plasper).to receive(:add_length_weight).with(5).once
       plasper.add_word 'hello'
@@ -228,6 +228,23 @@ RSpec.describe Plasper::Plasper do
       expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
       plasper.add_next_weight 'a', 'b'
       plasper.next_letter 'a'
+    end
+  end
+
+  describe '#last_letter' do
+    it 'returns nil when last_weight is empty' do
+      expect(plasper.last_letter 'a').to be_nil
+    end
+
+    it 'returns nil when letter is not present in last_weight' do
+      plasper.add_last_weight 'a', 'b'
+      expect(plasper.last_letter 'b').to be_nil
+    end
+
+    it 'returns weighted-random letter from last-letter weights' do
+      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
+      plasper.add_last_weight 'a', 'b'
+      plasper.last_letter 'a'
     end
   end
 end
