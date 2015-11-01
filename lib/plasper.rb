@@ -9,6 +9,20 @@ module Plasper
       @selectors = { next: Hash.new, last: Hash.new }
     end
 
+    def word
+      letter_count = word_length
+      if letter_count > 0
+        if letter_count == 1
+          last_letter nil
+        else
+          result = ''
+          result += first_letter
+          (letter_count - 2).times { result += next_letter(result[-1]) }
+          result + last_letter(result[-1])
+        end
+      end
+    end
+
     def first_letter
       if defined? @first_weight
         @selectors[:first] ||= WeightedSelect::Selector.new @first_weight
@@ -43,14 +57,14 @@ module Plasper
     end
 
     def add_next_weight(letter, next_letter, weight = 1)
-      @next_weight ||= Hash.new
+      @next_weight         ||= Hash.new
       @next_weight[letter] = Hash.new(0) unless @next_weight.has_key? letter
 
       @next_weight[letter][next_letter] += Integer weight
     end
 
     def add_last_weight(penultimate_letter, last_letter, weight = 1)
-      @last_weight ||= Hash.new
+      @last_weight                     ||= Hash.new
       @last_weight[penultimate_letter] = Hash.new(0) unless @last_weight.has_key? penultimate_letter
 
       @last_weight[penultimate_letter][last_letter] += Integer weight
@@ -89,6 +103,17 @@ module Plasper
       sentences = passage.split(/[?!.]/).select { |sentence| sentence.chomp != '' }
       sentences.each { |sentence| add_sentence sentence }
       add_sentences_weight sentences.count
+    end
+
+    private
+
+    def word_length
+      if defined? @length_weight
+        @selectors[:letters] ||= WeightedSelect::Selector.new @length_weight
+        @selectors[:letters].select
+      else
+        0
+      end
     end
   end
 end

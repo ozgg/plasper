@@ -247,4 +247,90 @@ RSpec.describe Plasper::Plasper do
       plasper.last_letter 'a'
     end
   end
+
+  describe '#word_length' do
+    it 'returns 0 when letters_weight is empty' do
+      expect(plasper.send(:word_length)).to eq(0)
+    end
+
+    it 'returns weighted-random number from letter_weight' do
+      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
+      plasper.add_length_weight 4
+      plasper.send(:word_length)
+    end
+  end
+
+  describe '#word' do
+    it 'selects random word length by weight once' do
+      expect(plasper).to receive(:word_length).once.and_return(0)
+      plasper.word
+    end
+
+    context 'when length is one letter' do
+      before(:each) { allow(plasper).to receive(:word_length).and_return(1) }
+
+      it 'calls #last_letter with nil once' do
+        expect(plasper).to receive(:last_letter).with(nil).once
+        plasper.word
+      end
+
+      it 'does not call #first_letter' do
+        expect(plasper).not_to receive(:first_letter)
+        plasper.word
+      end
+
+      it 'does not call #next_letter' do
+        expect(plasper).not_to receive(:next_letter)
+        plasper.word
+      end
+    end
+
+    context 'when length is two letters' do
+      before(:each) { allow(plasper).to receive(:word_length).and_return(2) }
+
+      it 'calls #first_letter once' do
+        expect(plasper).to receive(:first_letter).once.and_return 'a'
+        allow(plasper).to receive(:last_letter).and_return('')
+        plasper.word
+      end
+
+      it 'calls #last_letter with the first letter as argument once' do
+        allow(plasper).to receive(:first_letter).and_return('a')
+        expect(plasper).to receive(:last_letter).with('a').once.and_return('b')
+        plasper.word
+      end
+
+      it 'does not call #next_letter' do
+        allow(plasper).to receive(:first_letter).and_return('')
+        allow(plasper).to receive(:last_letter).and_return('')
+        expect(plasper).not_to receive(:next_letter)
+        plasper.word
+      end
+    end
+
+    context 'when length is more than two letters' do
+      before(:each) { allow(plasper).to receive(:word_length).and_return(4) }
+
+      it 'calls #first_letter once' do
+        allow(plasper).to receive(:next_letter).and_return('b')
+        allow(plasper).to receive(:last_letter).and_return('c')
+        expect(plasper).to receive(:first_letter).once.and_return('a')
+        plasper.word
+      end
+
+      it 'calls #next_letter (word.length - 2) times' do
+        allow(plasper).to receive(:first_letter).and_return('a')
+        allow(plasper).to receive(:last_letter).and_return('c')
+        expect(plasper).to receive(:next_letter).twice.and_return('b')
+        plasper.word
+      end
+
+      it 'calls #last_letter once' do
+        allow(plasper).to receive(:first_letter).and_return('a')
+        allow(plasper).to receive(:next_letter).and_return('b')
+        expect(plasper).to receive(:last_letter).once.and_return('c')
+        plasper.word
+      end
+    end
+  end
 end
