@@ -202,4 +202,21 @@ RSpec.describe Plasper::Plasper do
       plasper.first_letter
     end
   end
+
+  describe '#next_letter' do
+    it 'returns nil when next_weight is empty' do
+      expect(plasper.next_letter 'a').to be_nil
+    end
+
+    it 'returns nil when letter is not present in next_weight' do
+      plasper.add_next_weight 'a', 'b'
+      expect(plasper.next_letter 'b').to be_nil
+    end
+
+    it 'returns weighted-random letter from next-letter weights' do
+      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
+      plasper.add_next_weight 'a', 'b'
+      plasper.next_letter 'a'
+    end
+  end
 end

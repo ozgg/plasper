@@ -5,10 +5,22 @@ module Plasper
     attr_reader :length_weight, :letter_weight, :first_weight, :next_weight
     attr_reader :words_weight, :sentences_weight
 
+    def initialize
+      @selectors = Hash.new
+      @selectors[:next] = Hash.new
+    end
+
     def first_letter
       if defined? @first_weight
-        @letter_selector ||= WeightedSelect::Selector.new @first_weight
-        @letter_selector.select
+        @selectors[:first] ||= WeightedSelect::Selector.new @first_weight
+        @selectors[:first].select
+      end
+    end
+
+    def next_letter(current_letter)
+      if defined?(@next_weight) && @next_weight.has_key?(current_letter)
+        @selectors[:next][current_letter] ||= WeightedSelect::Selector.new @next_weight[current_letter]
+        @selectors[:next][current_letter].select
       end
     end
 
