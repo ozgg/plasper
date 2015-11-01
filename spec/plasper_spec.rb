@@ -4,23 +4,6 @@ require 'weighted-select'
 RSpec.describe Plasper::Plasper do
   let(:plasper) { Plasper::Plasper.new }
 
-  describe '#add_letter_weight' do
-    it 'uses 1 as default weight' do
-      plasper.add_letter_weight 'w'
-      expect(plasper.letter_weight['w']).to eq(1)
-    end
-
-    it 'counts letter_weight for letter' do
-      plasper.add_letter_weight 'w', 3
-      expect(plasper.letter_weight['w']).to eq(3)
-    end
-
-    it 'increases letter_weight for letter' do
-      plasper.add_letter_weight 'w'
-      expect { plasper.add_letter_weight 'w', 3 }.to change { plasper.letter_weight['w'] }.by(3)
-    end
-  end
-
   describe '#add_length_weight' do
     it 'uses 1 as default weight' do
       plasper.add_length_weight 6
@@ -66,7 +49,7 @@ RSpec.describe Plasper::Plasper do
       expect(plasper.next_weight['q']['w']).to eq(3)
     end
 
-    it 'increases first_weight for letter' do
+    it 'increases next_weight for letter' do
       plasper.add_next_weight 'q', 'w'
       expect { plasper.add_next_weight 'q', 'w', 2 }.to change { plasper.next_weight['q']['w'] }.by(2)
     end
@@ -75,6 +58,29 @@ RSpec.describe Plasper::Plasper do
       plasper.add_next_weight 'q', 'w'
       plasper.add_next_weight 's', 'w'
       expect { plasper.add_next_weight 'q', 'w' }.not_to change { plasper.next_weight['s']['w'] }
+    end
+  end
+
+  describe '#add_last_weight' do
+    it 'uses 1 as default weight' do
+      plasper.add_last_weight 'q', 'w'
+      expect(plasper.last_weight['q']['w']).to eq(1)
+    end
+
+    it 'counts last_weight for previous letter' do
+      plasper.add_last_weight 'q', 'w', 3
+      expect(plasper.last_weight['q']['w']).to eq(3)
+    end
+
+    it 'increases last_weight for letter' do
+      plasper.add_last_weight 'q', 'w'
+      expect { plasper.add_last_weight 'q', 'w', 2 }.to change { plasper.last_weight['q']['w'] }.by(2)
+    end
+
+    it 'does not change weights for other letters' do
+      plasper.add_last_weight 'q', 'w'
+      plasper.add_last_weight 's', 'w'
+      expect { plasper.add_last_weight 'q', 'w' }.not_to change { plasper.last_weight['s']['w'] }
     end
   end
 
@@ -118,11 +124,6 @@ RSpec.describe Plasper::Plasper do
       plasper.add_word 'hello'
     end
 
-    it 'increases letter weight for each letter' do
-      expect(plasper).to receive(:add_letter_weight).exactly(3).times
-      plasper.add_word 'hey'
-    end
-
     it 'increases first letter weight for letter' do
       expect(plasper).to receive(:add_first_weight).with('y').once
       plasper.add_word 'yay'
@@ -133,9 +134,19 @@ RSpec.describe Plasper::Plasper do
       plasper.add_word 'слово'
     end
 
+    it 'increases last letter weights for each letter' do
+      expect(plasper).to receive(:add_last_weight).once
+      plasper.add_word 'слово'
+    end
+
     it 'includes nil in next letter weight for the last letter' do
       plasper.add_word 'nils'
       expect(plasper.next_weight['s']).to have_key(nil)
+    end
+
+    it 'includes nil in last letter weight for 1-letter word' do
+      plasper.add_word 'в'
+      expect(plasper.last_weight).to have_key(nil)
     end
   end
 
@@ -157,7 +168,7 @@ RSpec.describe Plasper::Plasper do
 
     it 'keeps dashes' do
       plasper.add_sentence 'Чудо-юдо рыба-кит.'
-      expect(plasper.letter_weight).to have_key('-')
+      expect(plasper.next_weight).to have_key('-')
     end
 
     it 'casts each word to lowercase' do

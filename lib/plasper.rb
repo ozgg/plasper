@@ -2,7 +2,7 @@ require 'unicode'
 
 module Plasper
   class Plasper
-    attr_reader :length_weight, :letter_weight, :first_weight, :next_weight
+    attr_reader :length_weight, :first_weight, :next_weight, :last_weight
     attr_reader :words_weight, :sentences_weight
 
     def initialize
@@ -24,12 +24,6 @@ module Plasper
       end
     end
 
-    def add_letter_weight(letter, weight = 1)
-      @letter_weight ||= Hash.new(0)
-
-      @letter_weight[letter] += Integer weight
-    end
-
     def add_length_weight(length, weight = 1)
       @length_weight ||= Hash.new(0)
 
@@ -43,10 +37,17 @@ module Plasper
     end
 
     def add_next_weight(letter, next_letter, weight = 1)
-      @next_weight         ||= Hash.new
+      @next_weight ||= Hash.new
       @next_weight[letter] = Hash.new(0) unless @next_weight.has_key? letter
 
       @next_weight[letter][next_letter] += Integer weight
+    end
+
+    def add_last_weight(penultimate_letter, last_letter, weight = 1)
+      @last_weight ||= Hash.new
+      @last_weight[penultimate_letter] = Hash.new(0) unless @last_weight.has_key? penultimate_letter
+
+      @last_weight[penultimate_letter][last_letter] += Integer weight
     end
 
     def add_words_weight(word_count, weight = 1)
@@ -64,9 +65,9 @@ module Plasper
     # @param [String] word
     def add_word(word)
       add_length_weight word.length
-      word.each_char { |letter| add_letter_weight letter }
       add_first_weight word[0]
       word.length.times { |l| add_next_weight word[l], word[l.succ] }
+      add_last_weight word[-2], word[-1]
     end
 
     def add_sentence(sentence)
