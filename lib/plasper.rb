@@ -66,7 +66,7 @@ module Plasper
     def add_word(word)
       add_length_weight word.length
       add_first_weight word[0]
-      word.length.times { |l| add_next_weight word[l], word[l.succ] }
+      (word.length - 1).times { |l| add_next_weight word[l], word[l.succ] }
       add_last_weight word[-2], word[-1]
     end
 

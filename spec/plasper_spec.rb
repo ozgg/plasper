@@ -118,7 +118,7 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#add_word' do
+  describe '#add_word', focus: true do
     it 'increases length weight for word length' do
       expect(plasper).to receive(:add_length_weight).with(5).once
       plasper.add_word 'hello'
@@ -130,7 +130,7 @@ RSpec.describe Plasper::Plasper do
     end
 
     it 'increases next letter weights for each letter' do
-      expect(plasper).to receive(:add_next_weight).exactly(5).times
+      expect(plasper).to receive(:add_next_weight).exactly(4).times
       plasper.add_word 'слово'
     end
 
@@ -139,9 +139,9 @@ RSpec.describe Plasper::Plasper do
       plasper.add_word 'слово'
     end
 
-    it 'includes nil in next letter weight for the last letter' do
-      plasper.add_word 'nils'
-      expect(plasper.next_weight['s']).to have_key(nil)
+    it 'does not include nil in next letter weights for the last letter' do
+      plasper.add_word 'snakes'
+      expect(plasper.next_weight['s']).not_to have_key(nil)
     end
 
     it 'includes nil in last letter weight for 1-letter word' do
