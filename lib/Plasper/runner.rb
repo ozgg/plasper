@@ -26,6 +26,25 @@ module Plasper
       puts @plasper.passage
     end
 
+    def chat
+      puts 'Use ^D to exit.'
+      print 'Ego: '
+      while (input = STDIN.gets)
+        @plasper << input
+        if input.index(/\s+/).nil?
+          output = @plasper.word
+        elsif input.scan(Plasper::SENTENCE_DELIMITER).length < 2
+          output = @plasper.sentence
+        else
+          output = @plasper.passage
+        end
+
+        puts " Id: #{output}"
+        print 'Ego: '
+      end
+      puts
+    end
+
     def import_weights(path)
       if File.exists? path
         type, category = nil, nil
