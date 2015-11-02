@@ -4,8 +4,7 @@ module Plasper
 
     # Prepares selectors and weights storage
     def initialize
-      @selectors = { count: {}, first: {}, next: {}, last: {} }
-      @weights   = { count: {}, first: {}, next: {}, last: {} }
+      @weights = { count: {}, first: {}, next: {}, last: {} }
     end
 
     # Analyze word
@@ -44,7 +43,7 @@ module Plasper
       add_weight :count, :word, words.length
       words.each do |word|
         stripped_word = word.gsub(/[^[:word:]-]/u, '')
-        self.word = Unicode.downcase(stripped_word) unless stripped_word == ''
+        self.word     = Unicode.downcase(stripped_word) unless stripped_word == ''
       end
     end
 
@@ -52,7 +51,7 @@ module Plasper
     #
     # @return [String]
     def sentence
-      string = word_count.times.map { word }.join(' ')
+      string    = word_count.times.map { word }.join(' ')
       string[0] = Unicode.upcase(string[0]) unless string.to_s == ''
       string
     end
@@ -104,8 +103,8 @@ module Plasper
     # @param [Symbol|String] group
     def weighted(type, group)
       if @weights[type].has_key?(group)
-        @selectors[type][group] ||= WeightedSelect::Selector.new @weights[type][group]
-        @selectors[type][group].select
+        selector = WeightedSelect::Selector.new @weights[type][group]
+        selector.select
       end
     end
 
