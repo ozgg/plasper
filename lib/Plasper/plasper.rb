@@ -12,7 +12,7 @@ module Plasper
     # Analyze input and add appropriate part
     #
     # Determines if input is word, sentence or passage and adds it
-    # 
+    #
     # @param [String] input
     def <<(input)
       if input.index(/\s+/).nil?
