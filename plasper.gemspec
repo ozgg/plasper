@@ -16,6 +16,6 @@ Gem::Specification.new do |spec|
   spec.license       = 'MIT'
   spec.has_rdoc      = false
   spec.add_development_dependency "rspec", '~> 3.3'
-  spec.add_runtime_dependency 'weighted-select', '~> 1.0.0'
-  spec.add_runtime_dependency 'unicode', '~> 0.4.4'
+  spec.add_runtime_dependency 'weighted-select', '~> 1.0'
+  spec.add_runtime_dependency 'unicode', '~> 0.4'
 end

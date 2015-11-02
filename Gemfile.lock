@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     plasper (0.1.0)
-      unicode (~> 0.4.4)
-      weighted-select (~> 1.0.0)
+      unicode (~> 0.4)
+      weighted-select (~> 1.0)
 
 GEM
   remote: https://rubygems.org/
