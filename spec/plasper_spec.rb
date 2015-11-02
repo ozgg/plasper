@@ -21,23 +21,6 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#add_length_weight' do
-    it 'uses 1 as default weight' do
-      plasper.add_length_weight 6
-      expect(plasper.length_weight[6]).to eq(1)
-    end
-
-    it 'counts length_weight for length' do
-      plasper.add_length_weight 6, 3
-      expect(plasper.length_weight[6]).to eq(3)
-    end
-
-    it 'increases length_weight for length' do
-      plasper.add_length_weight 6
-      expect { plasper.add_length_weight 6, 3 }.to change { plasper.length_weight[6] }.by(3)
-    end
-  end
-
   describe '#add_first_weight' do
     it 'uses 1 as default weight' do
       plasper.add_first_weight 'w'
@@ -136,8 +119,8 @@ RSpec.describe Plasper::Plasper do
   end
 
   describe '#add_word' do
-    it 'increases length weight for word length' do
-      expect(plasper).to receive(:add_length_weight).with(5).once
+    it 'increases letter count weight for word length' do
+      expect(plasper).to receive(:add_weight).with(:letter_count, 5).once
       plasper.add_word 'hello'
     end
 
@@ -298,7 +281,7 @@ RSpec.describe Plasper::Plasper do
 
     it 'returns weighted-random number from letter_weight' do
       expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_length_weight 4
+      plasper.add_weight :letter_count, 4
       plasper.send(:word_length)
     end
   end

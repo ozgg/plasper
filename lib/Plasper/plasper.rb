@@ -59,12 +59,6 @@ module Plasper
       last_letter(penultimate_letter) || next_letter!(penultimate_letter)
     end
 
-    def add_length_weight(length, weight = 1)
-      @length_weight ||= Hash.new(0)
-
-      @length_weight[length] += Integer weight
-    end
-
     def add_first_weight(letter, weight = 1)
       @first_weight ||= Hash.new(0)
 
@@ -99,7 +93,7 @@ module Plasper
 
     # @param [String] word
     def add_word(word)
-      add_length_weight word.length
+      add_weight :letter_count, word.length
       add_first_weight word[0]
       (word.length - 1).times { |l| add_next_weight word[l], word[l.succ] }
       add_last_weight word[-2], word[-1]
@@ -129,8 +123,8 @@ module Plasper
     private
 
     def word_length
-      if defined? @length_weight
-        @selectors[:letters] ||= WeightedSelect::Selector.new @length_weight
+      if @weights.has_key? :letter_count
+        @selectors[:letters] ||= WeightedSelect::Selector.new @weights[:letter_count]
         @selectors[:letters].select
       else
         0
