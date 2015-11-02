@@ -50,6 +50,18 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
+  describe '#weighted_letter' do
+    it 'returns nil when letter is not present in @letters' do
+      expect(plasper.send(:weighted_letter, :next, 'a')).to be_nil
+    end
+
+    it 'returns weighted-random for existing letter in category' do
+      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
+      plasper.add_letter :next, 'q', 'w'
+      plasper.send(:weighted_letter, :next, 'q')
+    end
+  end
+
   describe '#add_word' do
     before(:each) do
       allow(plasper).to receive(:add_weight).and_call_original

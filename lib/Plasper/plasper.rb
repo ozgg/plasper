@@ -98,5 +98,12 @@ module Plasper
         @selectors[category].select
       end
     end
+
+    def weighted_letter(category, letter)
+      if @letters[category].has_key? letter
+        @selectors[category][letter] = WeightedSelect::Selector.new @letters[category][letter]
+        @selectors[category][letter].select
+      end
+    end
   end
 end
