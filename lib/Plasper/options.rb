@@ -68,7 +68,7 @@ module Plasper
     #
     # @param [OptionParser] options
     def usage_and_help(options)
-      options.banner = 'Usage: plasper [options] action'
+      options.banner = "Usage: plasper [options] action\n    action: dump (default), talk or chat"
       options.on('-h', '--help', 'Show this message') do
         puts options
         exit
