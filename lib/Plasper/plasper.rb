@@ -1,6 +1,5 @@
 module Plasper
   class Plasper
-    attr_reader :next_weight, :last_weight
     attr_reader :weights, :letters
 
     def initialize
@@ -35,8 +34,8 @@ module Plasper
     end
 
     def next_letter(current_letter)
-      if defined?(@next_weight) && @next_weight.has_key?(current_letter)
-        @selectors[:next][current_letter] ||= WeightedSelect::Selector.new @next_weight[current_letter]
+      if @letters[:next].has_key?(current_letter)
+        @selectors[:next][current_letter] ||= WeightedSelect::Selector.new @letters[:next][current_letter]
         @selectors[:next][current_letter].select
       end
     end
@@ -46,8 +45,8 @@ module Plasper
     end
 
     def last_letter(penultimate_letter)
-      if defined?(@last_weight) && @last_weight.has_key?(penultimate_letter)
-        @selectors[:last][penultimate_letter] ||= WeightedSelect::Selector.new @last_weight[penultimate_letter]
+      if @letters[:last].has_key?(penultimate_letter)
+        @selectors[:last][penultimate_letter] ||= WeightedSelect::Selector.new @letters[:last][penultimate_letter]
         @selectors[:last][penultimate_letter].select
       end
     end
@@ -56,26 +55,12 @@ module Plasper
       last_letter(penultimate_letter) || next_letter!(penultimate_letter)
     end
 
-    def add_next_weight(letter, next_letter, weight = 1)
-      @next_weight         ||= Hash.new
-      @next_weight[letter] = Hash.new(0) unless @next_weight.has_key? letter
-
-      @next_weight[letter][next_letter] += Integer weight
-    end
-
-    def add_last_weight(penultimate_letter, last_letter, weight = 1)
-      @last_weight                     ||= Hash.new
-      @last_weight[penultimate_letter] = Hash.new(0) unless @last_weight.has_key? penultimate_letter
-
-      @last_weight[penultimate_letter][last_letter] += Integer weight
-    end
-
     # @param [String] word
     def add_word(word)
       add_weight :letter_count, word.length
       add_weight :first_letter, word[0]
-      (word.length - 1).times { |l| add_next_weight word[l], word[l.succ] }
-      add_last_weight word[-2], word[-1]
+      (word.length - 1).times { |l| add_letter :next, word[l], word[l.succ] }
+      add_letter :last, word[-2], word[-1]
     end
 
     def add_sentence(sentence)
