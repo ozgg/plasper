@@ -7,6 +7,14 @@ module Plasper
       @weights   = { count: {}, first: {}, next: {}, last: {} }
     end
 
+    # @param [String] word
+    def word=(word)
+      add_weight :count, :letter, word.length
+      add_weight :first, :letter, word[0]
+      (word.length - 1).times { |l| add_weight :next, word[l], word[l.succ] }
+      add_weight :last, word[-2], word[-1]
+    end
+
     def word
       letter_count = weighted :count, :letter
       if letter_count == 1
@@ -18,10 +26,25 @@ module Plasper
       end
     end
 
+    def sentence=(sentence)
+      words = sentence.split(/\s+/)
+      add_weight :count, :word, words.length
+      words.each do |word|
+        stripped_word = word.gsub(/[^[:word:]-]/u, '')
+        self.word = Unicode.downcase(stripped_word) unless stripped_word == ''
+      end
+    end
+
     def sentence
       string = weighted(:count, :word).to_i.times.map { word }.join(' ')
       string[0] = Unicode.upcase(string[0]) unless string.to_s == ''
       string
+    end
+
+    def passage=(passage)
+      sentences = passage.split(/[?!.]/).select { |sentence| sentence.chomp != '' }
+      sentences.each { |sentence| self.sentence = sentence }
+      add_weight :count, :sentence, sentences.count
     end
 
     def passage
@@ -46,29 +69,6 @@ module Plasper
 
     def last_letter!(penultimate_letter)
       last_letter(penultimate_letter) || next_letter!(penultimate_letter)
-    end
-
-    # @param [String] word
-    def add_word(word)
-      add_weight :count, :letter, word.length
-      add_weight :first, :letter, word[0]
-      (word.length - 1).times { |l| add_weight :next, word[l], word[l.succ] }
-      add_weight :last, word[-2], word[-1]
-    end
-
-    def add_sentence(sentence)
-      words = sentence.split(/\s+/)
-      add_weight :count, :word, words.length
-      words.each do |word|
-        stripped_word = word.gsub(/[^[:word:]-]/u, '')
-        add_word Unicode.downcase(stripped_word) unless stripped_word == ''
-      end
-    end
-
-    def add_passage(passage)
-      sentences = passage.split(/[?!.]/).select { |sentence| sentence.chomp != '' }
-      sentences.each { |sentence| add_sentence sentence }
-      add_weight :count, :sentence, sentences.count
     end
 
     def add_weight(type, group, item, weight = 1)

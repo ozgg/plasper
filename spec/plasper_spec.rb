@@ -33,93 +33,93 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#add_word' do
+  describe '#word=' do
     before(:each) { allow(plasper).to receive(:add_weight).and_call_original }
 
     it 'increases letter count weight for word length' do
       expect(plasper).to receive(:add_weight).with(:count, :letter, 5).once
-      plasper.add_word 'hello'
+      plasper.word = 'hello'
     end
 
     it 'increases first letter weight for letter' do
       expect(plasper).to receive(:add_weight).with(:first, :letter, 'y').once
-      plasper.add_word 'yay'
+      plasper.word = 'yay'
     end
 
     it 'increases next letter weights for each letter' do
       expect(plasper).to receive(:add_weight).with(:next, any_args).exactly(4).times
-      plasper.add_word 'слово'
+      plasper.word = 'слово'
     end
 
     it 'increases last letter weights for each letter' do
       expect(plasper).to receive(:add_weight).with(:last, 'в', 'о').once
-      plasper.add_word 'слово'
+      plasper.word = 'слово'
     end
 
     it 'does not include nil in next letter weights for the last letter' do
-      plasper.add_word 'snakes'
+      plasper.word = 'snakes'
       expect(plasper.weights[:next]['s']).not_to have_key(nil)
     end
 
     it 'includes nil in last letter weight for 1-letter word' do
-      plasper.add_word 'в'
+      plasper.word = 'в'
       expect(plasper.weights[:last]).to have_key(nil)
     end
   end
 
-  describe '#add_sentence' do
+  describe '#sentence=' do
     before(:each) { allow(plasper).to receive(:add_weight).and_call_original }
 
     it 'splits sentence into words by whitespace' do
       expect_any_instance_of(String).to receive(:split).with(/\s+/).and_call_original
-      plasper.add_sentence 'Красные пятки торчат из грядки!'
+      plasper.sentence = 'Красные пятки торчат из грядки!'
     end
 
     it 'adds word count weight for number of words in sentence' do
       expect(plasper).to receive(:add_weight).with(:count, :word, 5).once
-      plasper.add_sentence 'Красные пятки торчат из грядки?'
+      plasper.sentence = 'Красные пятки торчат из грядки?'
     end
 
     it 'strips punctuation characters' do
       expect_any_instance_of(String).to receive(:gsub).and_call_original
-      plasper.add_sentence '"«Ага!»"?юю...'
+      plasper.sentence = '"«Ага!»"?юю...'
     end
 
     it 'keeps dashes' do
-      plasper.add_sentence 'Чудо-юдо рыба-кит.'
+      plasper.sentence = 'Чудо-юдо рыба-кит.'
       expect(plasper.weights[:next]).to have_key('-')
     end
 
     it 'casts each word to lowercase' do
       expect(Unicode).to receive(:downcase).and_call_original
-      plasper.add_sentence 'Бывает!'
+      plasper.sentence = 'Бывает!'
     end
 
-    it 'passes each reasonable word to #add_word' do
-      expect(plasper).to receive(:add_word).twice
-      plasper.add_sentence 'Какая чудесная ***!'
+    it 'passes each reasonable word to #word=' do
+      expect(plasper).to receive(:word=).twice
+      plasper.sentence = 'Какая чудесная ***!'
     end
   end
 
-  describe '#add_passage' do
+  describe '#passage=' do
     before(:each) { allow(plasper).to receive(:add_weight).and_call_original }
 
     it 'splits passage to sentences' do
       passage = 'Ночь, улица. Фонарь? Ещё и аптека!'
       expect(passage).to receive(:split).and_call_original
-      plasper.add_passage passage
+      plasper.passage = passage
     end
 
     it 'adds each non-empty sentence' do
       passage = 'Давно. А?! Это было давно?...'
-      expect(plasper).to receive(:add_sentence).exactly(3).times
-      plasper.add_passage passage
+      expect(plasper).to receive(:sentence=).exactly(3).times
+      plasper.passage = passage
     end
 
     it 'counts sentences weight with non-empty sentence count' do
       passage = 'Деда... Это... Опа.'
       expect(plasper).to receive(:add_weight).with(:count, :sentence, 3)
-      plasper.add_passage passage
+      plasper.passage = passage
     end
   end
 
