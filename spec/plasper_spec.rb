@@ -21,6 +21,23 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
+  describe '#add_letter' do
+    it 'uses 1 as default weight' do
+      plasper.add_letter :next, 'q', 'w'
+      expect(plasper.letters[:next]['q']['w']).to eq(1)
+    end
+
+    it 'uses explicitly set weight' do
+      plasper.add_letter :next, 'q', 'w', 2
+      expect(plasper.letters[:next]['q']['w']).to eq(2)
+    end
+
+    it 'increments weight for letter' do
+      plasper.add_letter :next, 'q', 'w', 4
+      expect { plasper.add_letter(:next, 'q', 'w', 3) }.to change { plasper.letters[:next]['q']['w'] }.by(3)
+    end
+  end
+
   describe '#weighted' do
     it 'returns nil when category is not present in @weights' do
       expect(plasper.send(:weighted, :nothing)).to be_nil

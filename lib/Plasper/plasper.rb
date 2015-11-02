@@ -99,6 +99,12 @@ module Plasper
       @weights[category][item] += Integer weight
     end
 
+    def add_letter(category, letter, adjacent_letter, weight = 1)
+      @letters[category][letter] ||= Hash.new(0)
+
+      @letters[category][letter][adjacent_letter] += Integer weight
+    end
+
     private
 
     def weighted(category)
