@@ -21,23 +21,6 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#add_first_weight' do
-    it 'uses 1 as default weight' do
-      plasper.add_first_weight 'w'
-      expect(plasper.first_weight['w']).to eq(1)
-    end
-
-    it 'counts first_weight for letter' do
-      plasper.add_first_weight 'w', 3
-      expect(plasper.first_weight['w']).to eq(3)
-    end
-
-    it 'increases first_weight for letter' do
-      plasper.add_first_weight 'w'
-      expect { plasper.add_first_weight 'w', 3 }.to change { plasper.first_weight['w'] }.by(3)
-    end
-  end
-
   describe '#add_next_weight' do
     it 'uses 1 as default weight' do
       plasper.add_next_weight 'q', 'w'
@@ -119,13 +102,15 @@ RSpec.describe Plasper::Plasper do
   end
 
   describe '#add_word' do
+    before(:each) { allow(plasper).to receive(:add_weight).and_call_original }
+
     it 'increases letter count weight for word length' do
       expect(plasper).to receive(:add_weight).with(:letter_count, 5).once
       plasper.add_word 'hello'
     end
 
     it 'increases first letter weight for letter' do
-      expect(plasper).to receive(:add_first_weight).with('y').once
+      expect(plasper).to receive(:add_weight).with(:first_letter, 'y').once
       plasper.add_word 'yay'
     end
 
@@ -209,7 +194,7 @@ RSpec.describe Plasper::Plasper do
 
     it 'returns weighted-random letter from first-letter weights' do
       expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_first_weight 'a'
+      plasper.add_weight :first_letter, 'a'
       plasper.first_letter
     end
   end

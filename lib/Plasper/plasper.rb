@@ -1,6 +1,6 @@
 module Plasper
   class Plasper
-    attr_reader :length_weight, :first_weight, :next_weight, :last_weight
+    attr_reader :next_weight, :last_weight
     attr_reader :words_weight, :sentences_weight
     attr_reader :weights
 
@@ -31,8 +31,8 @@ module Plasper
     end
 
     def first_letter
-      if defined? @first_weight
-        @selectors[:first] ||= WeightedSelect::Selector.new @first_weight
+      if @weights.has_key? :first_letter
+        @selectors[:first] ||= WeightedSelect::Selector.new @weights[:first_letter]
         @selectors[:first].select
       end
     end
@@ -57,12 +57,6 @@ module Plasper
 
     def last_letter!(penultimate_letter)
       last_letter(penultimate_letter) || next_letter!(penultimate_letter)
-    end
-
-    def add_first_weight(letter, weight = 1)
-      @first_weight ||= Hash.new(0)
-
-      @first_weight[letter] += Integer weight
     end
 
     def add_next_weight(letter, next_letter, weight = 1)
@@ -94,7 +88,7 @@ module Plasper
     # @param [String] word
     def add_word(word)
       add_weight :letter_count, word.length
-      add_first_weight word[0]
+      add_weight :first_letter, word[0]
       (word.length - 1).times { |l| add_next_weight word[l], word[l.succ] }
       add_last_weight word[-2], word[-1]
     end
