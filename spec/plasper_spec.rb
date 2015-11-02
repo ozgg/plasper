@@ -290,4 +290,52 @@ RSpec.describe Plasper::Plasper do
       expect(plasper.passage.scan('. ').length).to eq(2)
     end
   end
+
+  describe '#<<' do
+    context 'when input is single word' do
+      let!(:input) { 'Hello!' }
+
+      it 'strips characters that are not letters' do
+        expect(input).to receive(:gsub).once.and_call_original
+        plasper << input
+      end
+
+      it 'casts word to lowercase' do
+        expect(Unicode).to receive(:downcase).with('Hello').and_call_original
+        plasper << input
+      end
+
+      it 'analyzes word if it is not empty' do
+        expect(plasper).to receive(:word=).with('hello')
+        plasper << input
+      end
+
+      it 'does not analyze word if it is empty' do
+        expect(plasper).not_to receive(:word=)
+        plasper << '?!'
+      end
+    end
+
+    context 'when input is sentence' do
+      let!(:input) { 'Красные пятки торчат из грядки?' }
+
+      it 'strips sentence delimiters' do
+        expect(input).to receive(:gsub).with(Plasper::Plasper::SENTENCE_DELIMITER, any_args).once.and_call_original
+        plasper << input
+      end
+
+      it 'analyzes input as sentence' do
+        expect(plasper).to receive(:sentence=).with('Красные пятки торчат из грядки')
+        plasper << input
+      end
+    end
+
+    context 'when input is passage' do
+      it 'analyzes input as passage' do
+        input = 'Первое предложение. Второе тоже тут будет.'
+        expect(plasper).to receive(:passage=).with(input).once
+        plasper << input
+      end
+    end
+  end
 end

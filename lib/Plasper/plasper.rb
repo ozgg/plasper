@@ -2,9 +2,27 @@ module Plasper
   class Plasper
     attr_reader :weights
 
+    SENTENCE_DELIMITER = /[?!.]/
+
     # Prepares selectors and weights storage
     def initialize
       @weights = { count: {}, first: {}, next: {}, last: {} }
+    end
+
+    # Analyze input and add appropriate part
+    #
+    # Determines if input is word, sentence or passage and adds it
+    # 
+    # @param [String] input
+    def <<(input)
+      if input.index(/\s+/).nil?
+        word      = normalize_word input
+        self.word = word unless word == ''
+      elsif input.scan(SENTENCE_DELIMITER).length < 2
+        self.sentence = input.gsub(SENTENCE_DELIMITER, '')
+      else
+        self.passage = input
+      end
     end
 
     # Analyze word
@@ -42,8 +60,8 @@ module Plasper
       words = sentence.split(/\s+/)
       add_weight :count, :word, words.length
       words.each do |word|
-        stripped_word = word.gsub(/[^[:word:]-]/u, '')
-        self.word     = Unicode.downcase(stripped_word) unless stripped_word == ''
+        normalized_word = normalize_word word
+        self.word       = normalized_word unless normalized_word == ''
       end
     end
 
@@ -62,7 +80,7 @@ module Plasper
     #
     # @param [String] passage
     def passage=(passage)
-      sentences = passage.split(/[?!.]/).select { |sentence| sentence.chomp != '' }
+      sentences = passage.split(SENTENCE_DELIMITER).select { |sentence| sentence.chomp != '' }
       sentences.each { |sentence| self.sentence = sentence }
       add_weight :count, :sentence, sentences.count
     end
@@ -93,6 +111,10 @@ module Plasper
     end
 
     private
+
+    def normalize_word(word)
+      Unicode.downcase word.gsub(/[^[:word:]'-]/u, '')
+    end
 
     # Generate weighted-random value
     #
