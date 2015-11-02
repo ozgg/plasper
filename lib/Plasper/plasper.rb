@@ -1,12 +1,12 @@
 module Plasper
   class Plasper
     attr_reader :next_weight, :last_weight
-    attr_reader :words_weight, :sentences_weight
-    attr_reader :weights
+    attr_reader :weights, :letters
 
     def initialize
       @selectors = { next: Hash.new, last: Hash.new }
       @weights   = Hash.new
+      @letters   = { next: Hash.new, last: Hash.new }
     end
 
     def word
@@ -27,7 +27,7 @@ module Plasper
     end
 
     def passage
-      passage_length.times.map { sentence }.join('. ')
+      weighted(:sentence_count).to_i.times.map { sentence }.join('. ')
     end
 
     def first_letter
@@ -70,18 +70,6 @@ module Plasper
       @last_weight[penultimate_letter][last_letter] += Integer weight
     end
 
-    def add_words_weight(word_count, weight = 1)
-      @words_weight ||= Hash.new(0)
-
-      @words_weight[word_count] += Integer weight
-    end
-
-    def add_sentences_weight(sentence_count, weight = 1)
-      @sentences_weight ||= Hash.new(0)
-
-      @sentences_weight[sentence_count] += Integer weight
-    end
-
     # @param [String] word
     def add_word(word)
       add_weight :letter_count, word.length
@@ -102,7 +90,7 @@ module Plasper
     def add_passage(passage)
       sentences = passage.split(/[?!.]/).select { |sentence| sentence.chomp != '' }
       sentences.each { |sentence| add_sentence sentence }
-      add_sentences_weight sentences.count
+      add_weight :sentence_count, sentences.count
     end
 
     def add_weight(category, item, weight = 1)
@@ -117,15 +105,6 @@ module Plasper
       if @weights.has_key? category
         @selectors[category] ||= WeightedSelect::Selector.new @weights[category]
         @selectors[category].select
-      end
-    end
-
-    def passage_length
-      if defined? @sentences_weight
-        @selectors[:sentences] ||= WeightedSelect::Selector.new @sentences_weight
-        @selectors[:sentences].select
-      else
-        0
       end
     end
   end

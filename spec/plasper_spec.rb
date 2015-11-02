@@ -164,7 +164,7 @@ RSpec.describe Plasper::Plasper do
 
     it 'counts sentences weight with non-empty sentence count' do
       passage = 'Деда... Это... Опа.'
-      expect(plasper).to receive(:add_sentences_weight).with(3)
+      expect(plasper).to receive(:add_weight).with(:sentence_count, 3)
       plasper.add_passage passage
     end
   end
@@ -340,18 +340,18 @@ RSpec.describe Plasper::Plasper do
 
   describe '#passage' do
     it 'determines sentence count once' do
-      expect(plasper).to receive(:passage_length).and_return(0)
+      expect(plasper).to receive(:weighted).with(:sentence_count).and_return(0)
       plasper.passage
     end
 
     it 'calls #sentence necessary number of times' do
-      allow(plasper).to receive(:passage_length).and_return(5)
+      allow(plasper).to receive(:weighted).with(:sentence_count).and_return(5)
       expect(plasper).to receive(:sentence).exactly(5).times
       plasper.passage
     end
 
     it 'joins result of #sentence invocations with dot' do
-      allow(plasper).to receive(:passage_length).and_return(3)
+      allow(plasper).to receive(:weighted).with(:sentence_count).and_return(3)
       allow(plasper).to receive(:sentence).and_return('It works')
       expect(plasper.passage.scan('. ').length).to eq(2)
     end
