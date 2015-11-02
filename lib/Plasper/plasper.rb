@@ -34,10 +34,7 @@ module Plasper
     end
 
     def next_letter(current_letter)
-      if @letters[:next].has_key?(current_letter)
-        @selectors[:next][current_letter] ||= WeightedSelect::Selector.new @letters[:next][current_letter]
-        @selectors[:next][current_letter].select
-      end
+      weighted_letter :next, current_letter
     end
 
     def next_letter!(current_letter)
@@ -45,10 +42,7 @@ module Plasper
     end
 
     def last_letter(penultimate_letter)
-      if @letters[:last].has_key?(penultimate_letter)
-        @selectors[:last][penultimate_letter] ||= WeightedSelect::Selector.new @letters[:last][penultimate_letter]
-        @selectors[:last][penultimate_letter].select
-      end
+      weighted_letter :last, penultimate_letter
     end
 
     def last_letter!(penultimate_letter)
