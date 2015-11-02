@@ -1,7 +1,7 @@
 require 'plasper'
 
 RSpec.describe Plasper::Options do
-  context 'paths to files', focus: true do
+  context 'paths to files' do
     it 'assigns file path to text_file when -t is given' do
       options = Plasper::Options.new %w(-t text.txt)
       expect(options.text_file).to eq('text.txt')
@@ -34,8 +34,19 @@ RSpec.describe Plasper::Options do
   end
 
   context 'choosing action' do
-    it 'accepts talk action'
-    it 'accepts chat action'
-    it 'accepts dump action'
+    it 'assigns action after options' do
+      options = Plasper::Options.new ['talk']
+      expect(options.action).to eq('talk')
+    end
+
+    it 'assigns dump as default action' do
+      options = Plasper::Options.new []
+      expect(options.action).to eq(Plasper::Options::DEFAULT_ACTION)
+    end
+
+    it 'falls back to default action when action is invalid' do
+      options = Plasper::Options.new ['what?']
+      expect(options.action).to eq(Plasper::Options::DEFAULT_ACTION)
+    end
   end
 end

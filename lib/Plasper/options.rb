@@ -2,10 +2,15 @@ require 'optparse'
 
 module Plasper
   class Options
-    attr_reader :text_file, :weights_file, :output_file
+    attr_reader :text_file, :weights_file, :output_file, :action
+
+    DEFAULT_ACTION = 'dump'
+    VALID_ACTIONS  = [DEFAULT_ACTION, 'talk', 'chat']
 
     def initialize(argv)
       parse argv
+      @action = argv.first || DEFAULT_ACTION
+      @action = DEFAULT_ACTION unless VALID_ACTIONS.include? @action
     end
 
     private
@@ -18,7 +23,6 @@ module Plasper
         assign_output_file options
 
         begin
-          argv = ['-h'] if argv.empty?
           options.parse argv
         rescue OptionParser::ParseError => error
           STDERR.puts error.message, "\n", options
