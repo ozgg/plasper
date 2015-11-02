@@ -200,13 +200,8 @@ RSpec.describe Plasper::Plasper do
   end
 
   describe '#first_letter' do
-    it 'returns nil when no first letter weights present' do
-      expect(plasper.first_letter).to be_nil
-    end
-
-    it 'returns weighted-random letter from first-letter weights' do
-      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_weight :first_letter, 'a'
+    it 'calls #weighted with :first_letter' do
+      expect(plasper).to receive(:weighted).with(:first_letter)
       plasper.first_letter
     end
   end
@@ -271,18 +266,6 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#word_length' do
-    it 'returns 0 when letters_weight is empty' do
-      expect(plasper.send(:word_length)).to eq(0)
-    end
-
-    it 'returns weighted-random number from letter_weight' do
-      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_weight :letter_count, 4
-      plasper.send(:word_length)
-    end
-  end
-
   describe '#sentence_length' do
     it 'returns 0 when words_weight is empty' do
       expect(plasper.send(:sentence_length)).to eq(0)
@@ -309,12 +292,12 @@ RSpec.describe Plasper::Plasper do
 
   describe '#word' do
     it 'selects random word length by weight once' do
-      expect(plasper).to receive(:word_length).once.and_return(0)
+      expect(plasper).to receive(:weighted).with(:letter_count).once.and_return(0)
       plasper.word
     end
 
     context 'when length is one letter' do
-      before(:each) { allow(plasper).to receive(:word_length).and_return(1) }
+      before(:each) { allow(plasper).to receive(:weighted).with(:letter_count).and_return(1) }
 
       it 'calls #last_letter! with nil once' do
         expect(plasper).to receive(:last_letter!).with(nil).once
@@ -335,7 +318,7 @@ RSpec.describe Plasper::Plasper do
     end
 
     context 'when length is two letters' do
-      before(:each) { allow(plasper).to receive(:word_length).and_return(2) }
+      before(:each) { allow(plasper).to receive(:weighted).with(:letter_count).and_return(2) }
 
       it 'calls #first_letter once' do
         expect(plasper).to receive(:first_letter).once.and_return 'a'
@@ -358,7 +341,7 @@ RSpec.describe Plasper::Plasper do
     end
 
     context 'when length is more than two letters' do
-      before(:each) { allow(plasper).to receive(:word_length).and_return(4) }
+      before(:each) { allow(plasper).to receive(:weighted).with(:letter_count).and_return(4) }
 
       it 'calls #first_letter once' do
         allow(plasper).to receive(:next_letter!).and_return('b')

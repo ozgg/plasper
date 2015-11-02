@@ -10,7 +10,7 @@ module Plasper
     end
 
     def word
-      letter_count = word_length
+      letter_count = weighted :letter_count
       if letter_count == 1
         last_letter! nil
       elsif letter_count > 0
@@ -31,10 +31,7 @@ module Plasper
     end
 
     def first_letter
-      if @weights.has_key? :first_letter
-        @selectors[:first] ||= WeightedSelect::Selector.new @weights[:first_letter]
-        @selectors[:first].select
-      end
+      weighted :first_letter
     end
 
     def next_letter(current_letter)
@@ -120,15 +117,6 @@ module Plasper
       if @weights.has_key? category
         @selectors[category] ||= WeightedSelect::Selector.new @weights[category]
         @selectors[category].select
-      end
-    end
-
-    def word_length
-      if @weights.has_key? :letter_count
-        @selectors[:letters] ||= WeightedSelect::Selector.new @weights[:letter_count]
-        @selectors[:letters].select
-      else
-        0
       end
     end
 
