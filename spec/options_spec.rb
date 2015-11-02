@@ -35,12 +35,12 @@ RSpec.describe Plasper::Options do
 
   context 'choosing action' do
     it 'assigns action after options' do
-      options = Plasper::Options.new ['talk']
+      options = Plasper::Options.new %w(-w weights.yml talk)
       expect(options.action).to eq('talk')
     end
 
     it 'assigns dump as default action' do
-      options = Plasper::Options.new []
+      options = Plasper::Options.new %w(-t text.txt)
       expect(options.action).to eq(Plasper::Options::DEFAULT_ACTION)
     end
 

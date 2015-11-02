@@ -7,14 +7,20 @@ module Plasper
     DEFAULT_ACTION = 'dump'
     VALID_ACTIONS  = [DEFAULT_ACTION, 'talk', 'chat']
 
+    # Initialize with CLI arguments
+    #
+    # @param [Array] argv
     def initialize(argv)
       parse argv
-      @action = argv.first || DEFAULT_ACTION
+      @action = argv.last
       @action = DEFAULT_ACTION unless VALID_ACTIONS.include? @action
     end
 
     private
 
+    # Parse given arguments
+    #
+    # @param [Array] argv
     def parse(argv)
       OptionParser.new do |options|
         usage_and_help options
