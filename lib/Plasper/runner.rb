@@ -1,7 +1,14 @@
+require_relative 'plasper'
+require_relative 'options'
+
 module Plasper
   class Runner
     def initialize(argv)
-      @plasper, @options = Plasper.new, Options.new(argv)
+      @plasper = Plasper.new
+      @options = Options.new(argv)
+    end
+
+    def run
       import_weights @options.weights_file unless @options.weights_file.nil?
       import_text @options.text_file unless @options.text_file.nil?
       action = @options.action.to_sym
@@ -15,16 +22,21 @@ module Plasper
       dump_weights STDOUT
     end
 
+    def talk
+      puts @plasper.passage
+    end
+
     def import_weights(path)
       if File.exists? path
         type, category = nil, nil
         File.open(path).read.each_line do |line|
           if line =~ /\A\S+:\s*\z/
-            type = line.gsub(':', '').to_sym
+            type = line.gsub(/[:\s]/, '').to_sym
           elsif line =~ /\A  \S+:\s*\z/
-            category = line.gsub(/\s:/, '').to_sym
+            category = line.gsub(/[\s:]/, '')
+            category = category.to_sym if %w(word sentence letter).include? category
           elsif line =~ /\A    \S*?:\s+\d+\s*\z/
-            if type.is_a?(Symbol) && category.is_a?(Symbol)
+            if type.is_a?(Symbol) && !category.nil?
               item, weight = line.strip.split(':')
               @plasper.add_weight type, category, (item == '' ? nil : item), Integer(weight)
             end

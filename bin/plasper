@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'plasper/runner'
+
+runner = Plasper::Runner.new ARGV
+runner.run

@@ -1,3 +1,6 @@
+require 'unicode'
+require 'weighted-select'
+
 module Plasper
   class Plasper
     attr_reader :weights
@@ -41,7 +44,7 @@ module Plasper
     #
     # @return [String]
     def word
-      letter_count = weighted :count, :letter
+      letter_count = weighted(:count, :letter).to_i
       if letter_count == 1
         last_letter! nil
       elsif letter_count > 0
@@ -58,7 +61,7 @@ module Plasper
     # @param [String] sentence
     def sentence=(sentence)
       words = sentence.split(/\s+/)
-      add_weight :count, :word, words.length
+      add_weight :count, :word, words.length unless words.length < 1
       words.each do |word|
         normalized_word = normalize_word word
         self.word       = normalized_word unless normalized_word == ''
@@ -89,7 +92,7 @@ module Plasper
     #
     # @return [String]
     def passage
-      sentence_count.times.map { sentence }.join('. ')
+      sentence_count.times.map { sentence }.join('. ') + '.'
     end
 
     # Add weight
