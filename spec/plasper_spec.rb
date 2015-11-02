@@ -33,23 +33,8 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#weighted_letter' do
-    it 'returns nil when letter is not present in @letters' do
-      expect(plasper.send(:weighted_letter, :next, 'a')).to be_nil
-    end
-
-    it 'returns weighted-random for existing letter in category' do
-      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_letter :next, 'q', 'w'
-      plasper.send(:weighted_letter, :next, 'q')
-    end
-  end
-
   describe '#add_word' do
-    before(:each) do
-      allow(plasper).to receive(:add_weight).and_call_original
-      allow(plasper).to receive(:add_letter).and_call_original
-    end
+    before(:each) { allow(plasper).to receive(:add_weight).and_call_original }
 
     it 'increases letter count weight for word length' do
       expect(plasper).to receive(:add_weight).with(:flat, :letter_count, 5).once
@@ -62,31 +47,28 @@ RSpec.describe Plasper::Plasper do
     end
 
     it 'increases next letter weights for each letter' do
-      expect(plasper).to receive(:add_letter).with(:next, any_args).exactly(4).times
+      expect(plasper).to receive(:add_weight).with(:next, any_args).exactly(4).times
       plasper.add_word 'слово'
     end
 
     it 'increases last letter weights for each letter' do
-      expect(plasper).to receive(:add_letter).with(:last, 'в', 'о').once
+      expect(plasper).to receive(:add_weight).with(:last, 'в', 'о').once
       plasper.add_word 'слово'
     end
 
     it 'does not include nil in next letter weights for the last letter' do
       plasper.add_word 'snakes'
-      expect(plasper.letters[:next]['s']).not_to have_key(nil)
+      expect(plasper.weights[:next]['s']).not_to have_key(nil)
     end
 
     it 'includes nil in last letter weight for 1-letter word' do
       plasper.add_word 'в'
-      expect(plasper.letters[:last]).to have_key(nil)
+      expect(plasper.weights[:last]).to have_key(nil)
     end
   end
 
   describe '#add_sentence' do
-    before(:each) do
-      allow(plasper).to receive(:add_weight).and_call_original
-      allow(plasper).to receive(:add_letter).and_call_original
-    end
+    before(:each) { allow(plasper).to receive(:add_weight).and_call_original }
 
     it 'splits sentence into words by whitespace' do
       expect_any_instance_of(String).to receive(:split).with(/\s+/).and_call_original
@@ -105,7 +87,7 @@ RSpec.describe Plasper::Plasper do
 
     it 'keeps dashes' do
       plasper.add_sentence 'Чудо-юдо рыба-кит.'
-      expect(plasper.letters[:next]).to have_key('-')
+      expect(plasper.weights[:next]).to have_key('-')
     end
 
     it 'casts each word to lowercase' do
@@ -149,19 +131,9 @@ RSpec.describe Plasper::Plasper do
   end
 
   describe '#next_letter' do
-    it 'returns nil when next_weight is empty' do
-      expect(plasper.next_letter 'a').to be_nil
-    end
-
-    it 'returns nil when letter is not present in next_weight' do
-      plasper.add_letter :next, 'a', 'b'
-      expect(plasper.next_letter 'b').to be_nil
-    end
-
-    it 'returns weighted-random letter from next-letter weights' do
-      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_letter :next, 'a', 'b'
-      plasper.next_letter 'a'
+    it 'calls #weighted with :next and letter' do
+      expect(plasper).to receive(:weighted).with(:next, 'q')
+      plasper.next_letter 'q'
     end
   end
 
@@ -179,19 +151,9 @@ RSpec.describe Plasper::Plasper do
   end
 
   describe '#last_letter' do
-    it 'returns nil when last_weight is empty' do
-      expect(plasper.last_letter 'a').to be_nil
-    end
-
-    it 'returns nil when letter is not present in last_weight' do
-      plasper.add_letter :last, 'a', 'b'
-      expect(plasper.last_letter 'b').to be_nil
-    end
-
-    it 'returns weighted-random letter from last-letter weights' do
-      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_letter :last, 'a', 'b'
-      plasper.last_letter 'a'
+    it 'calls #weighted with :last and letter' do
+      expect(plasper).to receive(:weighted).with(:last, 'q')
+      plasper.last_letter 'q'
     end
   end
 

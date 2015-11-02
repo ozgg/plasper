@@ -1,11 +1,10 @@
 module Plasper
   class Plasper
-    attr_reader :weights, :letters
+    attr_reader :weights
 
     def initialize
-      @selectors = { next: Hash.new, last: Hash.new }
+      @selectors = {}
       @weights   = {}
-      @letters   = { next: Hash.new, last: Hash.new }
     end
 
     def word
@@ -34,7 +33,7 @@ module Plasper
     end
 
     def next_letter(current_letter)
-      weighted_letter :next, current_letter
+      weighted :next, current_letter
     end
 
     def next_letter!(current_letter)
@@ -42,7 +41,7 @@ module Plasper
     end
 
     def last_letter(penultimate_letter)
-      weighted_letter :last, penultimate_letter
+      weighted :last, penultimate_letter
     end
 
     def last_letter!(penultimate_letter)
@@ -53,8 +52,8 @@ module Plasper
     def add_word(word)
       add_weight :flat, :letter_count, word.length
       add_weight :flat, :first_letter, word[0]
-      (word.length - 1).times { |l| add_letter :next, word[l], word[l.succ] }
-      add_letter :last, word[-2], word[-1]
+      (word.length - 1).times { |l| add_weight :next, word[l], word[l.succ] }
+      add_weight :last, word[-2], word[-1]
     end
 
     def add_sentence(sentence)
@@ -78,12 +77,6 @@ module Plasper
       @weights[outer][inner][item] += Integer weight
     end
 
-    def add_letter(category, letter, adjacent_letter, weight = 1)
-      @letters[category][letter] ||= Hash.new(0)
-
-      @letters[category][letter][adjacent_letter] += Integer weight
-    end
-
     private
 
     def weighted(outer, inner)
@@ -91,13 +84,6 @@ module Plasper
         @selectors[outer] ||= Hash.new
         @selectors[outer][inner] ||= WeightedSelect::Selector.new @weights[outer][inner]
         @selectors[outer][inner].select
-      end
-    end
-
-    def weighted_letter(category, letter)
-      if @letters[category].has_key? letter
-        @selectors[category][letter] = WeightedSelect::Selector.new @letters[category][letter]
-        @selectors[category][letter].select
       end
     end
   end
