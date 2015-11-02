@@ -4,7 +4,7 @@ module Plasper
 
     def initialize
       @selectors = { next: Hash.new, last: Hash.new }
-      @weights   = Hash.new
+      @weights   = {}
       @letters   = { next: Hash.new, last: Hash.new }
     end
 
@@ -72,10 +72,10 @@ module Plasper
       add_weight :sentence_count, sentences.count
     end
 
-    def add_weight(category, item, weight = 1)
-      @weights[category] ||= Hash.new(0)
+    def add_weight(outer, inner, item, weight = 1)
+      @weights[outer] ||= { inner => Hash.new(0) }
 
-      @weights[category][item] += Integer weight
+      @weights[outer][inner][item] += Integer weight
     end
 
     def add_letter(category, letter, adjacent_letter, weight = 1)
@@ -86,10 +86,11 @@ module Plasper
 
     private
 
-    def weighted(category)
-      if @weights.has_key? category
-        @selectors[category] ||= WeightedSelect::Selector.new @weights[category]
-        @selectors[category].select
+    def weighted(outer, inner)
+      if @weights.has_key?(outer) && @weights[outer].has_key?(inner)
+        @selectors[outer] ||= Hash.new
+        @selectors[outer][inner] ||= WeightedSelect::Selector.new @weights[outer][inner]
+        @selectors[outer][inner].select
       end
     end
 

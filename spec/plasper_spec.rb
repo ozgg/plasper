@@ -6,18 +6,18 @@ RSpec.describe Plasper::Plasper do
 
   describe '#add_weight' do
     it 'uses 1 as default weight' do
-      plasper.add_weight :letters, 6
-      expect(plasper.weights[:letters][6]).to eq(1)
+      plasper.add_weight :a, :b, 6
+      expect(plasper.weights[:a][:b][6]).to eq(1)
     end
 
     it 'uses explicitly set weight' do
-      plasper.add_weight :letters, 5, 2
-      expect(plasper.weights[:letters][5]).to eq(2)
+      plasper.add_weight :a, :b, 5, 2
+      expect(plasper.weights[:a][:b][5]).to eq(2)
     end
 
     it 'increments weight for key' do
-      plasper.add_weight :letters, 7, 4
-      expect { plasper.add_weight(:letters, 7, 3) }.to change { plasper.weights[:letters][7] }.by(3)
+      plasper.add_weight :a, :b, 7, 4
+      expect { plasper.add_weight(:a, :b, 7, 3) }.to change { plasper.weights[:a][:b][7] }.by(3)
     end
   end
 
@@ -40,13 +40,13 @@ RSpec.describe Plasper::Plasper do
 
   describe '#weighted' do
     it 'returns nil when category is not present in @weights' do
-      expect(plasper.send(:weighted, :nothing)).to be_nil
+      expect(plasper.send(:weighted, :nothing, :at_all)).to be_nil
     end
 
     it 'returns weighted-random for existing category' do
       expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_weight :first_letter, 'a'
-      plasper.send(:weighted, :first_letter)
+      plasper.add_weight :flat, :first_letter, 'a'
+      plasper.send(:weighted, :flat, :first_letter)
     end
   end
 
