@@ -67,7 +67,7 @@ module Plasper
     end
 
     def first_letter
-      weighted(:first, :letter).to_i
+      weighted :first, :letter
     end
 
     def next_letter(current_letter)
