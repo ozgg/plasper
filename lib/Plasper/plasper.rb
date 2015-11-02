@@ -116,6 +116,13 @@ module Plasper
 
     private
 
+    def weighted(category)
+      if @weights.has_key? category
+        @selectors[category] ||= WeightedSelect::Selector.new @weights[category]
+        @selectors[category].select
+      end
+    end
+
     def word_length
       if @weights.has_key? :letter_count
         @selectors[:letters] ||= WeightedSelect::Selector.new @weights[:letter_count]

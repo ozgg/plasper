@@ -21,6 +21,18 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
+  describe '#weighted' do
+    it 'returns nil when category is not present in @weights' do
+      expect(plasper.send(:weighted, :nothing)).to be_nil
+    end
+
+    it 'returns weighted-random for existing category' do
+      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
+      plasper.add_weight :first_letter, 'a'
+      plasper.send(:weighted, :first_letter)
+    end
+  end
+
   describe '#add_next_weight' do
     it 'uses 1 as default weight' do
       plasper.add_next_weight 'q', 'w'
