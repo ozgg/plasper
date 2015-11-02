@@ -36,7 +36,7 @@ module Plasper
     end
 
     def sentence
-      string = weighted(:count, :word).to_i.times.map { word }.join(' ')
+      string = word_count.times.map { word }.join(' ')
       string[0] = Unicode.upcase(string[0]) unless string.to_s == ''
       string
     end
@@ -48,7 +48,22 @@ module Plasper
     end
 
     def passage
-      weighted(:count, :sentence).to_i.times.map { sentence }.join('. ')
+      sentence_count.times.map { sentence }.join('. ')
+    end
+
+    def add_weight(type, group, item, weight = 1)
+      @weights[type][group] ||= Hash.new(0)
+
+      @weights[type][group][item] += Integer weight
+    end
+
+    private
+
+    def weighted(type, group)
+      if @weights[type].has_key?(group)
+        @selectors[type][group] ||= WeightedSelect::Selector.new @weights[type][group]
+        @selectors[type][group].select
+      end
     end
 
     def first_letter
@@ -71,19 +86,12 @@ module Plasper
       last_letter(penultimate_letter) || next_letter!(penultimate_letter)
     end
 
-    def add_weight(type, group, item, weight = 1)
-      @weights[type][group] ||= Hash.new(0)
-
-      @weights[type][group][item] += Integer weight
+    def word_count
+      weighted(:count, :word).to_i
     end
 
-    private
-
-    def weighted(type, group)
-      if @weights[type].has_key?(group)
-        @selectors[type][group] ||= WeightedSelect::Selector.new @weights[type][group]
-        @selectors[type][group].select
-      end
+    def sentence_count
+      weighted(:count, :sentence).to_i
     end
   end
 end

@@ -126,47 +126,47 @@ RSpec.describe Plasper::Plasper do
   describe '#first_letter' do
     it 'calls #weighted with :first_letter' do
       expect(plasper).to receive(:weighted).with(:first, :letter)
-      plasper.first_letter
+      plasper.send :first_letter
     end
   end
 
   describe '#next_letter' do
     it 'calls #weighted with :next and letter' do
       expect(plasper).to receive(:weighted).with(:next, 'q')
-      plasper.next_letter 'q'
+      plasper.send :next_letter, 'q'
     end
   end
 
   describe '#next_letter!' do
     it 'calls #next_letter' do
       expect(plasper).to receive(:next_letter).with('a').once
-      plasper.next_letter! 'a'
+      plasper.send :next_letter!, 'a'
     end
 
     it 'falls back to #first_letter' do
       allow(plasper).to receive(:next_letter).and_return(nil)
       expect(plasper).to receive(:first_letter)
-      plasper.next_letter! 'b'
+      plasper.send :next_letter!, 'b'
     end
   end
 
   describe '#last_letter' do
     it 'calls #weighted with :last and letter' do
       expect(plasper).to receive(:weighted).with(:last, 'q')
-      plasper.last_letter 'q'
+      plasper.send :last_letter, 'q'
     end
   end
 
   describe '#last_letter!' do
     it 'calls #last_letter' do
       expect(plasper).to receive(:last_letter).with('a').once
-      plasper.last_letter! 'a'
+      plasper.send :last_letter!, 'a'
     end
 
     it 'falls back to #next_letter!' do
       allow(plasper).to receive(:last_letter).and_return(nil)
       expect(plasper).to receive(:next_letter!).with('b')
-      plasper.last_letter! 'b'
+      plasper.send :last_letter!, 'b'
     end
   end
 
