@@ -21,7 +21,7 @@ module Plasper
     end
 
     def sentence
-      string = sentence_length.times.map { word }.join(' ')
+      string = weighted(:word_count).to_i.times.map { word }.join(' ')
       string[0] = Unicode.upcase(string[0]) unless string.to_s == ''
       string
     end
@@ -92,7 +92,7 @@ module Plasper
 
     def add_sentence(sentence)
       words = sentence.split(/\s+/)
-      add_words_weight words.length
+      add_weight :word_count, words.length
       words.each do |word|
         stripped_word = word.gsub(/[^[:word:]-]/u, '')
         add_word Unicode.downcase(stripped_word) unless stripped_word == ''
@@ -117,15 +117,6 @@ module Plasper
       if @weights.has_key? category
         @selectors[category] ||= WeightedSelect::Selector.new @weights[category]
         @selectors[category].select
-      end
-    end
-
-    def sentence_length
-      if defined? @words_weight
-        @selectors[:words] ||= WeightedSelect::Selector.new @words_weight
-        @selectors[:words].select
-      else
-        0
       end
     end
 

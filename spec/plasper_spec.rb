@@ -79,40 +79,6 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#add_words_weight' do
-    it 'uses 1 as default weight' do
-      plasper.add_words_weight 6
-      expect(plasper.words_weight[6]).to eq(1)
-    end
-
-    it 'counts words_weight for length' do
-      plasper.add_words_weight 6, 3
-      expect(plasper.words_weight[6]).to eq(3)
-    end
-
-    it 'increases words_weight for length' do
-      plasper.add_words_weight 6
-      expect { plasper.add_words_weight 6, 3 }.to change { plasper.words_weight[6] }.by(3)
-    end
-  end
-
-  describe '#add_sentences_weight' do
-    it 'uses 1 as default weight' do
-      plasper.add_sentences_weight 6
-      expect(plasper.sentences_weight[6]).to eq(1)
-    end
-
-    it 'counts sentences_weight for length' do
-      plasper.add_sentences_weight 6, 3
-      expect(plasper.sentences_weight[6]).to eq(3)
-    end
-
-    it 'increases sentences_weight for length' do
-      plasper.add_sentences_weight 6
-      expect { plasper.add_sentences_weight 6, 3 }.to change { plasper.sentences_weight[6] }.by(3)
-    end
-  end
-
   describe '#add_word' do
     before(:each) { allow(plasper).to receive(:add_weight).and_call_original }
 
@@ -148,13 +114,15 @@ RSpec.describe Plasper::Plasper do
   end
 
   describe '#add_sentence' do
+    before(:each) { allow(plasper).to receive(:add_weight).and_call_original }
+
     it 'splits sentence into words by whitespace' do
       expect_any_instance_of(String).to receive(:split).with(/\s+/).and_call_original
       plasper.add_sentence 'Красные пятки торчат из грядки!'
     end
 
-    it 'adds words_weight for number of words in sentence' do
-      expect(plasper).to receive(:add_words_weight).once.with(5)
+    it 'adds word count weight for number of words in sentence' do
+      expect(plasper).to receive(:add_weight).with(:word_count, 5).once
       plasper.add_sentence 'Красные пятки торчат из грядки?'
     end
 
@@ -180,6 +148,8 @@ RSpec.describe Plasper::Plasper do
   end
 
   describe '#add_passage' do
+    before(:each) { allow(plasper).to receive(:add_weight).and_call_original }
+
     it 'splits passage to sentences' do
       passage = 'Ночь, улица. Фонарь? Ещё и аптека!'
       expect(passage).to receive(:split).and_call_original
@@ -266,30 +236,6 @@ RSpec.describe Plasper::Plasper do
     end
   end
 
-  describe '#sentence_length' do
-    it 'returns 0 when words_weight is empty' do
-      expect(plasper.send(:sentence_length)).to eq(0)
-    end
-
-    it 'returns weighted-random number from words_weight' do
-      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_words_weight 4
-      plasper.send(:sentence_length)
-    end
-  end
-
-  describe '#passage_length' do
-    it 'returns 0 when sentences_weight is empty' do
-      expect(plasper.send(:passage_length)).to eq(0)
-    end
-
-    it 'returns weighted-random number from sentences_weight' do
-      expect_any_instance_of(WeightedSelect::Selector).to receive(:select)
-      plasper.add_sentences_weight 4
-      plasper.send(:passage_length)
-    end
-  end
-
   describe '#word' do
     it 'selects random word length by weight once' do
       expect(plasper).to receive(:weighted).with(:letter_count).once.and_return(0)
@@ -368,24 +314,24 @@ RSpec.describe Plasper::Plasper do
 
   describe '#sentence' do
     it 'determines word count once' do
-      expect(plasper).to receive(:sentence_length).and_return(0)
+      expect(plasper).to receive(:weighted).with(:word_count).and_return(0)
       plasper.sentence
     end
 
     it 'calls #word necessary number of times' do
-      allow(plasper).to receive(:sentence_length).and_return(3)
+      allow(plasper).to receive(:weighted).with(:word_count).and_return(3)
       expect(plasper).to receive(:word).exactly(3).times
       plasper.sentence
     end
 
     it 'joins result of #word invocations with space' do
-      allow(plasper).to receive(:sentence_length).and_return(3)
+      allow(plasper).to receive(:weighted).with(:word_count).and_return(3)
       allow(plasper).to receive(:word).and_return('good')
       expect(plasper.sentence.scan(' ').length).to eq(2)
     end
 
     it 'capitalizes the first letter of sentence' do
-      allow(plasper).to receive(:sentence_length).and_return(3)
+      allow(plasper).to receive(:weighted).with(:word_count).and_return(3)
       allow(plasper).to receive(:word).and_return('good')
       expect(Unicode).to receive(:upcase).with('g').once.and_call_original
       plasper.sentence
